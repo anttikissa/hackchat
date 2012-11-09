@@ -1,0 +1,19 @@
+{
+  "name": "nko3-hack-hack-hack",
+  "version": "0.0.0",
+  "description": "Hack hack hack",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:nko3/hack-hack-hack.git"
+  },
+  "dependencies": {
+  },
+  "engines": {
+    "node": "0.8.x"
+  },
+  "subdomain": "hack-hack-hack.nko3"
+}
