@@ -30,14 +30,13 @@ say = function(channel, msg) {
 };
 
 show = function(msg) {
-  return $('body').append("<p>" + (escapeHtml(msg)) + "</p>");
+  return $('.chat').append("<p>" + (escapeHtml(msg)) + "</p>");
 };
 
 mynick = null;
 
 $(function() {
   mynick = $('.mynick').html();
-  $('body').append('<p>Hello from coffee</p>');
   $('#ping').click(function() {
     return ping();
   });

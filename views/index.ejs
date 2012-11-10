@@ -3,9 +3,34 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="script.js"></script>
+<link rel="stylesheet" href="style.css">
+
+<div class="hide">
+
+
+</div>
+
+<div class="page">
+
+	<div class="chat">
 
 <h1>Hi <span class="mynick"><%= nick %></span>!</h1>
 <button id='ping'>Ping</button><br>
 Change nick:<input id="nick"></input><br>
 Join channel: <input id="channel"></input><br>
 Say on channel <input id="sayChannel"></input>: <input id="msg"></input>
+
+
+		<p>Hello</p>
+	</div>
+
+	<div class="input">
+		<table>
+			<tr>
+				<td class="pre">&lt;<span class="mynick"><%= nick
+				%></span>&gt;&nbsp;</td><td width='100%'><input></input></td>
+			</tr>
+		</table>
+	</div>
+
+</div>

@@ -15,14 +15,12 @@ say = (channel, msg) ->
 	socket.emit 'say', channel: channel, msg: msg
 
 show = (msg) ->
-	$('body').append "<p>#{escapeHtml msg}</p>"
+	$('.chat').append "<p>#{escapeHtml msg}</p>"
 
 mynick = null
 
 $ ->
 	mynick = $('.mynick').html()
-
-	$('body').append('<p>Hello from coffee</p>')
 
 	$('#ping').click ->
 		ping()

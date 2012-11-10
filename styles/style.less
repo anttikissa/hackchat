@@ -1,0 +1,41 @@
+@import 'styles/reset.less';
+
+.text {
+	font-size: 16px;
+	font-family: 'Courier New', Courier, monospace;
+}
+
+body {
+	.text;
+}
+
+.page {
+	margin: 0 2em 2em 2em;
+	background: #eee;
+	padding: 1em;
+}
+
+.hide {
+	display: none;
+}
+
+.chat {
+
+}
+
+.input {
+	td.pre {
+		white-space: nowrap;
+	}
+	input {
+		width: 100%;
+		background: none;
+		border: none;
+		.text;
+		&:focus {
+			outline: none;
+		}
+	}
+}
+
+
