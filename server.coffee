@@ -76,9 +76,16 @@ io.on 'connection', (socket) ->
 	sessionID = socket.handshake.sessionID
 	session = socket.handshake.session
 	console.log "*** #{session.nick} @ #{socket.id} connected"
+
+	greeter = setInterval(->
+		console.log "Saying hello to #{session.nick} @ #{socket}"
+		socket.emit 'msg', { from: 'server', msg: 'hello' }
+	,	1000)
+
 	socket.on 'ping', (data) ->
 		console.log "(#{session.nick} @ #{socket.id}) PING #{JSON.stringify data}"
 		socket.emit 'pong', data
+
 	socket.on 'newNick', ({ newNick }) ->
 		console.log "*** #{session.nick} wants new nick: #{JSON.stringify newNick}"
 		if validNick newNick
@@ -96,6 +103,7 @@ io.on 'connection', (socket) ->
 
 	socket.on 'disconnect', ->
 		console.log "*** #{session.nick} @ #{socket.id} disconnected"
+		clearInterval greeter
 
 server.listen 3000
 console.log 'http://localhost:3000'
