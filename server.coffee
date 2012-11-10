@@ -4,15 +4,22 @@ express = require 'express'
 sio = require 'socket.io'
 http = require 'http'
 compiler = require 'connect-compiler'
+RedisStore = require('connect-redis')(express)
 
 app = express()
 server = http.createServer app
 io = sio.listen server
 
+sessionStore = new RedisStore(host: 'nodejitsudb6214129596.redis.irstack.com', pass: 'nodejitsudb6214129596.redis.irstack.com:f327cfe980c971946e80b8e975fbebb4')
+
 app.set 'views', 'public'
+
+secret = 'l6fsJUF)JH3JV6^'
 
 app.use express.favicon()
 app.use express.logger()
+app.use express.cookieParser(secret)
+app.use express.session(key: 's', store: sessionStore)
 app.use compiler(enabled: ['coffee'], src: 'coffee', dest: 'public')
 app.use express.static('public')
 app.get '/', (req, resp) ->

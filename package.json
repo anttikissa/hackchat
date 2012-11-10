@@ -15,7 +15,8 @@
     "express": "~3.0.2",
     "socket.io": "~0.9.11",
     "ejs": "~0.8.3",
-    "connect-compiler": "~0.1.2"
+    "connect-compiler": "~0.1.2",
+    "connect-redis": "~1.4.5"
   },
   "engines": {
     "node": "0.8.x"
