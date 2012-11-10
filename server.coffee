@@ -15,5 +15,11 @@ app.use express.logger()
 app.get '/', (req, resp) ->
 	resp.render 'index.ejs', { msg: 'hello' }
 
+io.on 'connection', (socket) ->
+	console.log "*** #{socket.id} connected"
+	socket.on 'ping', (data) ->
+		console.log "(#{socket.id}) PING #{JSON.stringify data}"
+		socket.emit 'pong', data
+
 server.listen 3000
 console.log 'http://localhost:3000'
