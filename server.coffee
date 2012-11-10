@@ -44,11 +44,34 @@ app.use (req, resp, next) ->
 app.get '/', (req, resp) ->
 	resp.render 'index.ejs', { nick: req.session.nick }
 
+io.set 'authorization', (data, cb) ->
+	cookieHeader = data.headers.cookie
+	if not cookieHeader
+		return cb "no cookies"
+	parsedCookie = cookie.parse cookieHeader
+	if not parsedCookie
+		return cb "invalid cookies"
+	sessionCookie = parsedCookie.s
+	sessionID = parseSignedCookie sessionCookie, secret
+	if not sessionID
+		return cb "invalid session cookie"
+	sessionStore.get sessionID, (err, session) ->
+		if not session
+			cb "no session"
+		else
+			data.sessionID = sessionID
+			data.session = session
+			cb null, true
+
 io.on 'connection', (socket) ->
-	console.log "*** #{socket.id} connected"
+	sessionID = socket.handshake.sessionID
+	session = socket.handshake.session
+	console.log "*** #{session.nick} @ #{socket.id} connected"
 	socket.on 'ping', (data) ->
-		console.log "(#{socket.id}) PING #{JSON.stringify data}"
+		console.log "(#{session.nick} @ #{socket.id}) PING #{JSON.stringify data}"
 		socket.emit 'pong', data
+	socket.on 'disconnect', ->
+		console.log "*** #{session.nick} @ #{socket.id} disconnected"
 
 server.listen 3000
 console.log 'http://localhost:3000'
