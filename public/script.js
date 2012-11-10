@@ -1,4 +1,4 @@
-var ping, socket;
+var newNick, ping, show, socket;
 
 ping = function() {
   return socket.emit('ping', {
@@ -6,10 +6,25 @@ ping = function() {
   });
 };
 
+newNick = function(newNick) {
+  return socket.emit('nick', {
+    newNick: {
+      newNick: newNick
+    }
+  });
+};
+
+show = function(msg) {
+  return $('body').append("<p>" + msg + "</p>");
+};
+
 $(function() {
   $('body').append('<p>Hello from coffee</p>');
-  $('button').click(function() {
+  $('#ping').click(function() {
     return ping();
+  });
+  $('#newNick').click(function() {
+    return newNick($('#nick'));
   });
   socket.on('connect', function() {
     return ping();
@@ -18,7 +33,7 @@ $(function() {
     var backThen, now;
     backThen = data.ts;
     now = new Date().getTime();
-    return $('body').append("<p>PONG " + (JSON.stringify(data)) + ", roundtrip " + (now - backThen) + " ms");
+    return show("PONG " + (JSON.stringify(data)) + ", roundtrip " + (now - backThen) + " ms");
   });
 });
 
