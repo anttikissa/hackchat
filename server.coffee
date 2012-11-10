@@ -66,7 +66,6 @@ io.set 'authorization', (data, cb) ->
 validNick = (nick) ->
 	okChars = nick.match /^[a-z0-9_]+$/
 	okLength = nick.length < 16
-	console.log "#{nick} chars #{okChars} len #{okLength}"
 	okChars and okLength
 
 nickTaken = (nick) ->
@@ -76,6 +75,11 @@ io.on 'connection', (socket) ->
 	sessionID = socket.handshake.sessionID
 	session = socket.handshake.session
 	console.log "*** #{session.nick} @ #{socket.id} connected"
+
+	sessionStore.on "#{sessionID} updated", (newSession) ->
+		console.log "*** #{session.nick} @ #{socket.id}, updating session..."
+		session = newSession
+		console.log "*** #{session.nick} @ #{socket.id}, session updated."
 
 	greeter = setInterval(->
 		console.log "Saying hello to #{session.nick} @ #{socket.id}"
@@ -97,6 +101,7 @@ io.on 'connection', (socket) ->
 				sessionStore.set sessionID, session, (err) ->
 					if err
 						console.log "Error saving session #{sessionID}"
+				sessionStore.emit("#{sessionID} updated", session)
 
 		else
 			socket.emit 'error', { msg: "Invalid nick. Must be alphanumeric & at most 15 characters long." }
