@@ -27,7 +27,11 @@ module.exports.connection = (sessionStore) ->
 			console.log "*** #{session.nick} @ #{socket.id}, session updated."
 
 			if session.nick != oldSession.nick
-				socket.emit 'newNick', { newNick: session.nick }
+				# TODO find out all channels of this session
+				# then emit to them
+				socket.emit 'newNick',
+					oldNick: oldSession.nick
+					newNick: session.nick
 
 		greeter = setInterval(->
 			console.log "Saying hello to #{session.nick} @ #{socket.id}"
@@ -41,6 +45,7 @@ module.exports.connection = (sessionStore) ->
 		socket.on 'newNick', ({ newNick }) ->
 #			console.log "*** #{session.nick} wants new nick: #{JSON.stringify newNick}"
 			if newNick == session.nick
+				socket.emit 'error', { msg: "You're already known as #{newNick}." }
 				return
 
 			if nickUtil.validNick newNick

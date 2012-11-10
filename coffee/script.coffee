@@ -111,11 +111,14 @@ $ ->
 		backThen = data.ts
 		now = new Date().getTime()
 		show "PONG #{JSON.stringify data}, roundtrip #{now - backThen} ms"
-	
-	socket.on 'newNick', ({ newNick }) ->
-		show "*** You are now known as #{newNick}."
-		$('.mynick').html(newNick)
-		mynick = newNick
+
+	socket.on 'newNick', ({ oldNick, newNick }) ->
+		if oldNick == mynick
+			show "*** You are now known as #{newNick}."
+			mynick = newNick
+			$('.mynick').html(newNick)
+		else
+			show "*** #{oldNick} is now known as #{newNick}."
 
 	socket.on 'error', ({ msg }) ->
 		show "*** #{msg}"

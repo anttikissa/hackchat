@@ -163,11 +163,15 @@ $(function() {
     return show("PONG " + (JSON.stringify(data)) + ", roundtrip " + (now - backThen) + " ms");
   });
   socket.on('newNick', function(_arg) {
-    var newNick;
-    newNick = _arg.newNick;
-    show("*** You are now known as " + newNick + ".");
-    $('.mynick').html(newNick);
-    return mynick = newNick;
+    var newNick, oldNick;
+    oldNick = _arg.oldNick, newNick = _arg.newNick;
+    if (oldNick === mynick) {
+      show("*** You are now known as " + newNick + ".");
+      mynick = newNick;
+      return $('.mynick').html(newNick);
+    } else {
+      return show("*** " + oldNick + " is now known as " + newNick + ".");
+    }
   });
   socket.on('error', function(_arg) {
     var msg;

@@ -4,6 +4,13 @@ class Session
 	constructor: (@sessionID) ->
 		# connections are sockets.
 		@connections = []
+		@channels = []
+
+	joinChannel: (channel) ->
+		# TODO
+
+	leaveChannel: (channel) ->
+		# TODO
 
 	newConnection: (socket) ->
 		@connections.push socket
