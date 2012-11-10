@@ -4,7 +4,9 @@ nick = require './nick'
 
 console.dir nick
 
-exports.connection = (sessionStore) ->
+# Handles a connection with a single socket.io client (i.e. a browser window).
+
+module.exports.connection = (sessionStore) ->
 	(socket) ->
 		sessionID = socket.handshake.sessionID
 		session = socket.handshake.session
