@@ -61,6 +61,8 @@ $ ->
 	socket.on 'say', ({ nick, channel, msg }) ->
 		show "<#{nick} ##{channel}> #{msg}"
 
+	$('#cmd').focus()
+
 socket = io.connect()
 
 

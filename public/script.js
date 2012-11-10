@@ -83,11 +83,12 @@ $(function() {
       return $('#sayChannel').val(channel);
     }
   });
-  return socket.on('say', function(_arg) {
+  socket.on('say', function(_arg) {
     var channel, msg, nick;
     nick = _arg.nick, channel = _arg.channel, msg = _arg.msg;
     return show("<" + nick + " #" + channel + "> " + msg);
   });
+  return $('#cmd').focus();
 });
 
 socket = io.connect();
