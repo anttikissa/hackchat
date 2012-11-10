@@ -3,6 +3,7 @@
 express = require 'express'
 sio = require 'socket.io'
 http = require 'http'
+compiler = require 'connect-compiler'
 
 app = express()
 server = http.createServer app
@@ -12,6 +13,8 @@ app.set 'views', 'public'
 
 app.use express.favicon()
 app.use express.logger()
+app.use compiler(enabled: ['coffee'], src: 'coffee', dest: 'public')
+app.use express.static('public')
 app.get '/', (req, resp) ->
 	resp.render 'index.ejs', { msg: 'hello' }
 

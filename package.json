@@ -14,7 +14,8 @@
     "coffee-script": "~1.4.0",
     "express": "~3.0.2",
     "socket.io": "~0.9.11",
-    "ejs": "~0.8.3"
+    "ejs": "~0.8.3",
+    "connect-compiler": "~0.1.2"
   },
   "engines": {
     "node": "0.8.x"
