@@ -63,6 +63,15 @@ io.set 'authorization', (data, cb) ->
 			data.session = session
 			cb null, true
 
+validNick = (nick) ->
+	okChars = nick.match /^[a-z0-9_]+$/
+	okLength = nick.length < 16
+	console.log "#{nick} chars #{okChars} len #{okLength}"
+	okChars and okLength
+
+nickTaken = (nick) ->
+	false
+
 io.on 'connection', (socket) ->
 	sessionID = socket.handshake.sessionID
 	session = socket.handshake.session
@@ -70,6 +79,17 @@ io.on 'connection', (socket) ->
 	socket.on 'ping', (data) ->
 		console.log "(#{session.nick} @ #{socket.id}) PING #{JSON.stringify data}"
 		socket.emit 'pong', data
+	socket.on 'newNick', ({ newNick }) ->
+		console.log "*** #{session.nick} wants new nick: #{JSON.stringify newNick}"
+		if validNick newNick
+			if nickTaken newNick
+				socket.emit 'error', { msg: "Nick already in use." }
+			else
+				session.nick = newNick
+				socket.emit 'newNick', { newNick: newNick }
+		else
+			socket.emit 'error', { msg: "Invalid nick. Must be alphanumeric & at most 15 characters long." }
+
 	socket.on 'disconnect', ->
 		console.log "*** #{session.nick} @ #{socket.id} disconnected"
 

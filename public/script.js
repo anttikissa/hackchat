@@ -7,10 +7,8 @@ ping = function() {
 };
 
 newNick = function(newNick) {
-  return socket.emit('nick', {
-    newNick: {
-      newNick: newNick
-    }
+  return socket.emit('newNick', {
+    newNick: newNick
   });
 };
 
@@ -24,16 +22,25 @@ $(function() {
     return ping();
   });
   $('#newNick').click(function() {
-    return newNick($('#nick'));
+    var nick;
+    console.log("newNick");
+    nick = $('#nick').val();
+    console.log("change to " + nick);
+    return newNick(nick);
   });
   socket.on('connect', function() {
     return ping();
   });
-  return socket.on('pong', function(data) {
+  socket.on('pong', function(data) {
     var backThen, now;
     backThen = data.ts;
     now = new Date().getTime();
     return show("PONG " + (JSON.stringify(data)) + ", roundtrip " + (now - backThen) + " ms");
+  });
+  return socket.on('newNick', function(_arg) {
+    var newNick;
+    newNick = _arg.newNick;
+    return show("Nick changed to " + newNick);
   });
 });
 

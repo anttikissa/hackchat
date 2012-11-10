@@ -2,7 +2,7 @@ ping = ->
 	socket.emit('ping', { ts: new Date().getTime() })
 
 newNick = (newNick) ->
-	socket.emit('nick', { newNick: { newNick }})
+	socket.emit('newNick', { newNick: newNick })
 
 show = (msg) ->
 	$('body').append "<p>#{msg}</p>"
@@ -14,7 +14,10 @@ $ ->
 		ping()
 
 	$('#newNick').click ->
-		newNick($('#nick'))
+		console.log "newNick"
+		nick = $('#nick').val()
+		console.log "change to #{nick}"
+		newNick(nick)
 
 	socket.on 'connect', ->
 		ping()
@@ -23,6 +26,9 @@ $ ->
 		backThen = data.ts
 		now = new Date().getTime()
 		show "PONG #{JSON.stringify data}, roundtrip #{now - backThen} ms"
+	
+	socket.on 'newNick', ({ newNick }) ->
+		show "Nick changed to #{newNick}"
 
 socket = io.connect()
 
