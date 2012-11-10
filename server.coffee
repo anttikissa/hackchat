@@ -9,11 +9,10 @@ app = express()
 
 server = http.createServer app
 
-app.use express.static('public')
+app.use express.favicon()
+app.use express.logger()
 
-#server = http.createServer (req, res) ->
-#  res.writeHead(200, {'Content-Type': 'text/plain'})
-#  res.end('Hello World\n')
+app.use express.static('public')
 
 server.listen 3000
 
