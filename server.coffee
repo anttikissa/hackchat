@@ -22,6 +22,21 @@ app.use express.cookieParser(secret)
 app.use express.session(key: 's', store: sessionStore)
 app.use compiler(enabled: ['coffee'], src: 'coffee', dest: 'public')
 app.use express.static('public')
+
+newNick = () ->
+	t = new Date().getTime() % 456976
+	"anon_" + t.toString(26)
+
+app.use (req, resp, next) ->
+	if not req.session.nick?
+		nick = newNick()
+		console.log "*** #{req.sessionID} is new user, giving nick #{nick}"
+		req.session.nick = newNick()
+	else
+		console.log "*** #{req.sessionID} is returning user with nick #{req.session.nick}"
+
+	next()
+
 app.get '/', (req, resp) ->
 	resp.render 'index.ejs', { msg: 'hello' }
 
