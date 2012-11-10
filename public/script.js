@@ -40,7 +40,8 @@ $(function() {
   return socket.on('newNick', function(_arg) {
     var newNick;
     newNick = _arg.newNick;
-    return show("Nick changed to " + newNick);
+    show("Nick changed to " + newNick);
+    return $('.mynick').html(newNick);
   });
 });
 

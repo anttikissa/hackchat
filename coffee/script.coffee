@@ -29,6 +29,7 @@ $ ->
 	
 	socket.on 'newNick', ({ newNick }) ->
 		show "Nick changed to #{newNick}"
+		$('.mynick').html(newNick)
 
 socket = io.connect()
 
