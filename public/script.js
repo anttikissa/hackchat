@@ -29,6 +29,12 @@ join = function(channel) {
 };
 
 names = function(channel) {
+  if (channel == null) {
+    channel = mychannel;
+  }
+  if (!channel) {
+    show('*** Please specify channel.');
+  }
   channel = sanitize(channel);
   return socket.emit('names', {
     channel: channel
@@ -42,7 +48,8 @@ help = function(help) {
   show("*** /join <channel> - join a channel. Alias: /j");
   show("*** /names [<channel>] - show who's on a channel");
   show("*** /help - here we are. Alias: /h");
-  return show("*** /ping - ping the server.");
+  show("*** /ping - ping the server.");
+  return show("*** /reconnect - try to connect to the server we're not connected.");
 };
 
 say = function(channel, msg) {
@@ -108,6 +115,9 @@ execute = function(cmd) {
     case 'help':
     case 'h':
       return help(args);
+    case 'reconnect':
+    case 're':
+      return io.connect();
     default:
       return show("*** I don't know that command: " + command + ".");
   }

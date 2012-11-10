@@ -72,14 +72,15 @@ module.exports.connection = (sessionStore) ->
 			clearInterval greeter
 			sessions[sessionID].connectionClosed(socket)
 
-		socket.on 'names', ({ channel }) ->
+		names = (channel) ->
 			if channels[channel]?
 				channels[channel].sessions (err, sessions) ->
-					console.log "### got sessions #{JSON.stringify sessions}"
-					console.log "### TODO implement names"
 					socket.emit 'names', { channel: channel, names: _.pluck sessions, 'nick' }
 			else
 				socket.emit 'error', { msg: "No such channel #{channel}. Better luck next time." }
+
+		socket.on 'names', ({ channel }) ->
+			names channel
 
 		socket.on 'join', ({ channel }) ->
 			channel = channel.replace /^#+/, ''
@@ -95,6 +96,7 @@ module.exports.connection = (sessionStore) ->
 					# better to push this logic into Channel?
 					console.log "*** Channel #{channel}: #{theChannel.members.join ' '}"
 					theChannel.emit 'join', { nick: session.nick, channel: channel }
+					names channel
 				else
 					socket.emit 'error', { msg: "You're already on that channel!" }
 

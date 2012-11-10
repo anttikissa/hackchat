@@ -19,6 +19,11 @@ join = (channel) ->
 	socket.emit 'join', channel: channel
 
 names = (channel) ->
+	channel ?= mychannel
+
+	if not channel
+		show '*** Please specify channel.'
+
 	channel = sanitize channel
 	socket.emit 'names', channel: channel
 
@@ -34,6 +39,7 @@ help = (help) ->
 #	show "*** /msg <nick> <message> - send private message to <nick>"
 	show "*** /help - here we are. Alias: /h"
 	show "*** /ping - ping the server."
+	show "*** /reconnect - try to connect to the server we're not connected."
 
 say = (channel, msg) ->
 	if not channel?
@@ -68,6 +74,7 @@ execute = (cmd) ->
 		when 'names', 'n' then names (args[0] ? mychannel)
 		when 'say', 's' then say mychannel, args
 		when 'help', 'h' then help args
+		when 'reconnect', 're' then io.connect()
 		else show "*** I don't know that command: #{command}."
 
 mynick = null
