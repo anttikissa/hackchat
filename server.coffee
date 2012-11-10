@@ -10,6 +10,8 @@ app = express()
 server = http.createServer app
 io = sio.listen server
 
+io.set 'log level', 1
+
 sessionStore = new RedisStore(host: 'nodejitsudb6214129596.redis.irstack.com', pass: 'nodejitsudb6214129596.redis.irstack.com:f327cfe980c971946e80b8e975fbebb4')
 
 app.set 'views', 'views'
