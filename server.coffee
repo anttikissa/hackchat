@@ -7,6 +7,7 @@ compiler = require 'connect-compiler'
 RedisStore = require('connect-redis')(express)
 cookie = require 'cookie'
 parseSignedCookie = require('connect/lib/utils').parseSignedCookie
+_ = require 'underscore'
 
 app = express()
 server = http.createServer app
@@ -77,9 +78,13 @@ io.on 'connection', (socket) ->
 	console.log "*** #{session.nick} @ #{socket.id} connected"
 
 	sessionStore.on "#{sessionID} updated", (newSession) ->
+		oldSession = session
 		console.log "*** #{session.nick} @ #{socket.id}, updating session..."
 		session = newSession
 		console.log "*** #{session.nick} @ #{socket.id}, session updated."
+
+		if session.nick != oldSession.nick
+			socket.emit 'newNick', { newNick: session.nick }
 
 	greeter = setInterval(->
 		console.log "Saying hello to #{session.nick} @ #{socket.id}"
@@ -96,12 +101,12 @@ io.on 'connection', (socket) ->
 			if nickTaken newNick
 				socket.emit 'error', { msg: "Nick already in use." }
 			else
-				session.nick = newNick
-				socket.emit 'newNick', { newNick: newNick }
-				sessionStore.set sessionID, session, (err) ->
+				newSession = _.extend {}, session, nick: newNick
+
+				sessionStore.set sessionID, newSession, (err) ->
 					if err
 						console.log "Error saving session #{sessionID}"
-				sessionStore.emit("#{sessionID} updated", session)
+				sessionStore.emit("#{sessionID} updated", newSession)
 
 		else
 			socket.emit 'error', { msg: "Invalid nick. Must be alphanumeric & at most 15 characters long." }

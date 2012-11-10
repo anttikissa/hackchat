@@ -18,7 +18,8 @@
     "connect-compiler": "~0.1.2",
     "connect-redis": "~1.4.5",
     "cookie": "0.0.5",
-    "connect": "~2.6.2"
+    "connect": "~2.6.2",
+    "underscore": "~1.4.2"
   },
   "engines": {
     "node": "0.8.x"
