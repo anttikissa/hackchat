@@ -72,7 +72,7 @@ $ ->
 		show "PONG #{JSON.stringify data}, roundtrip #{now - backThen} ms"
 	
 	socket.on 'newNick', ({ newNick }) ->
-		show "Nick changed to #{newNick}"
+		show "*** You are now known as #{newNick}."
 		$('.mynick').html(newNick)
 		mynick = newNick
 

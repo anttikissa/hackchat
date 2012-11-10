@@ -114,7 +114,7 @@ $(function() {
   socket.on('newNick', function(_arg) {
     var newNick;
     newNick = _arg.newNick;
-    show("Nick changed to " + newNick);
+    show("*** You are now known as " + newNick + ".");
     $('.mynick').html(newNick);
     return mynick = newNick;
   });
