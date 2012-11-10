@@ -1,6 +1,6 @@
 {
   "name": "nko3-hack-hack-hack",
-  "version": "0.0.0",
+  "version": "0.0.0-1",
   "description": "Hack hack hack",
   "main": "server.coffee",
   "scripts": {
@@ -11,6 +11,9 @@
     "url": "git@github.com:nko3/hack-hack-hack.git"
   },
   "dependencies": {
+    "coffee-script": "~1.4.0",
+    "express": "~3.0.2",
+    "socket.io": "~0.9.11"
   },
   "engines": {
     "node": "0.8.x"
