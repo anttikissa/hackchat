@@ -38,7 +38,7 @@ app.use (req, resp, next) ->
 	next()
 
 app.get '/', (req, resp) ->
-	resp.render 'index.ejs', { msg: 'hello' }
+	resp.render 'index.ejs', { nick: req.session.nick }
 
 io.on 'connection', (socket) ->
 	console.log "*** #{socket.id} connected"
