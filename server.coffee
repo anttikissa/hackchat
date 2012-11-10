@@ -5,6 +5,8 @@ sio = require 'socket.io'
 http = require 'http'
 compiler = require 'connect-compiler'
 RedisStore = require('connect-redis')(express)
+cookie = require 'cookie'
+parseSignedCookie = require('connect/lib/utils').parseSignedCookie
 
 app = express()
 server = http.createServer app

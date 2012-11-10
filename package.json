@@ -1,6 +1,6 @@
 {
   "name": "nko3-hack-hack-hack",
-  "version": "0.0.0-5",
+  "version": "0.0.0-6",
   "description": "Hack hack hack",
   "main": "server.coffee",
   "scripts": {
@@ -16,7 +16,9 @@
     "socket.io": "~0.9.11",
     "ejs": "~0.8.3",
     "connect-compiler": "~0.1.2",
-    "connect-redis": "~1.4.5"
+    "connect-redis": "~1.4.5",
+    "cookie": "0.0.5",
+    "connect": "~2.6.2"
   },
   "engines": {
     "node": "0.8.x"
