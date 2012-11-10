@@ -12,7 +12,11 @@ join = (channel) ->
 	socket.emit 'join', channel: channel
 
 say = (channel, msg) ->
-	socket.emit 'say', channel: channel, msg: msg
+	if not channel?
+		show "*** You're not on a channel - try joining one. /list shows available channels."
+	else
+		channel = channel.replace /^#+/, ''
+		socket.emit 'say', channel: channel, msg: msg
 
 show = (msg) ->
 	$('.chat').append "<p>#{escapeHtml msg}</p>"
@@ -33,10 +37,16 @@ execute = (cmd) ->
 	else
 		{ command, args } = { command: 'say', args: cmd }
 
-	console.log "COMMAND #{command}."
-	console.log "ARGS #{JSON.stringify args}."
+	switch command
+		when 'nick' then newNick args[0]
+		when 'ping' then ping()
+		when 'join' then join args[0]
+		when 'say' then say mychannel, args
+		else show "*** I don't know that command: #{command}."
 
 mynick = null
+mychannel = null
+#"#foo"
 
 $ ->
 	mynick = $('.mynick').html()
@@ -80,7 +90,10 @@ $ ->
 	socket.on 'say', ({ nick, channel, msg }) ->
 		show "<#{nick} ##{channel}> #{msg}"
 
-	$('#cmd').focus()
+	focus = ->
+		$('#cmd').focus()# unless mousedown
+	focus()
+#	setInterval(focus, 300)
 
 	$('#cmd').keypress (event) ->
 		if event.keyCode == 13
@@ -89,5 +102,4 @@ $ ->
 			$(event.target).val('')
 
 socket = io.connect()
-
 

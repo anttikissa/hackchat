@@ -1,4 +1,4 @@
-var escapeHtml, execute, isCommand, join, mynick, newNick, parseCommand, ping, say, show, socket,
+var escapeHtml, execute, isCommand, join, mychannel, mynick, newNick, parseCommand, ping, say, show, socket,
   __slice = [].slice;
 
 escapeHtml = function(s) {
@@ -24,10 +24,15 @@ join = function(channel) {
 };
 
 say = function(channel, msg) {
-  return socket.emit('say', {
-    channel: channel,
-    msg: msg
-  });
+  if (!(channel != null)) {
+    return show("*** You're not on a channel - try joining one. /list shows available channels.");
+  } else {
+    channel = channel.replace(/^#+/, '');
+    return socket.emit('say', {
+      channel: channel,
+      msg: msg
+    });
+  }
 };
 
 show = function(msg) {
@@ -64,13 +69,26 @@ execute = function(cmd) {
       args: cmd
     }, command = _ref1.command, args = _ref1.args;
   }
-  console.log("COMMAND " + command + ".");
-  return console.log("ARGS " + (JSON.stringify(args)) + ".");
+  switch (command) {
+    case 'nick':
+      return newNick(args[0]);
+    case 'ping':
+      return ping();
+    case 'join':
+      return join(args[0]);
+    case 'say':
+      return say(mychannel, args);
+    default:
+      return show("*** I don't know that command: " + command + ".");
+  }
 };
 
 mynick = null;
 
+mychannel = null;
+
 $(function() {
+  var focus;
   mynick = $('.mynick').html();
   $('#ping').click(function() {
     return ping();
@@ -123,7 +141,10 @@ $(function() {
     nick = _arg.nick, channel = _arg.channel, msg = _arg.msg;
     return show("<" + nick + " #" + channel + "> " + msg);
   });
-  $('#cmd').focus();
+  focus = function() {
+    return $('#cmd').focus();
+  };
+  focus();
   return $('#cmd').keypress(function(event) {
     var cmd;
     if (event.keyCode === 13) {
