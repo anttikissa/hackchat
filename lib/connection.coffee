@@ -51,7 +51,14 @@ module.exports.connection = (sessionStore) ->
 				socket.emit 'error', { msg: "Invalid nick. Must be alphanumeric & at most 15 characters long." }
 
 		socket.on 'say', ({ channel, msg }) ->
-			console.log "*** <#{session.nick} #{channel}> #{msg}"
+			if channels[channel]?.has sessionID
+				console.log "*** <#{session.nick} #{channel}> #{msg}"
+				channels[channel].emit 'say',
+					nick: session.nick,
+					channel: channel,
+					msg: msg
+			else
+				socket.emit 'error', { msg: "You're not on #{channel}. Cannot say." }
 
 		socket.on 'disconnect', ->
 			console.log "*** #{session.nick} @ #{socket.id} disconnected"

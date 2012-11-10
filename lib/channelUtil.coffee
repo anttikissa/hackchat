@@ -12,6 +12,13 @@ class Channel
 			@members.push sessionID
 			true
 
+	has: (sessionID) ->
+		sessionID in @members
+
+	emit: (what, data) ->
+		for sessionID in @members
+			console.log "### send #{what} to #{sessionID}..."
+		
 	hello: ->	
 		console.log "Hello channel!"
 

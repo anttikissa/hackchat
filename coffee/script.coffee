@@ -34,7 +34,7 @@ $ ->
 		join($('#channel').val())
 
 	$('#msg').change ->
-		say($('#channel').val(), $('#msg').val())
+		say($('#sayChannel').val(), $('#msg').val())
 
 	socket.on 'connect', ->
 		ping()

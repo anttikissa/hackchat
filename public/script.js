@@ -48,7 +48,7 @@ $(function() {
     return join($('#channel').val());
   });
   $('#msg').change(function() {
-    return say($('#channel').val(), $('#msg').val());
+    return say($('#sayChannel').val(), $('#msg').val());
   });
   socket.on('connect', function() {
     return ping();
