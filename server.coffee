@@ -78,8 +78,8 @@ io.on 'connection', (socket) ->
 	console.log "*** #{session.nick} @ #{socket.id} connected"
 
 	greeter = setInterval(->
-		console.log "Saying hello to #{session.nick} @ #{socket}"
-		socket.emit 'msg', { from: 'server', msg: 'hello' }
+		console.log "Saying hello to #{session.nick} @ #{socket.id}"
+		socket.emit 'msg', { from: 'server', msg: "hello #{session.nick}!" }
 	,	1000)
 
 	socket.on 'ping', (data) ->
