@@ -77,18 +77,18 @@ module.exports.connection = (sessionStore) ->
 				channels[channel].sessions (err, sessions) ->
 					console.log "### got sessions #{JSON.stringify sessions}"
 					console.log "### TODO implement names"
+					socket.emit 'names', { channel: channel, names: _.pluck sessions, 'nick' }
 			else
 				socket.emit 'error', { msg: "No such channel #{channel}. Better luck next time." }
 
 		socket.on 'join', ({ channel }) ->
-			that = this
 			channel = channel.replace /^#+/, ''
 
 			if not channelUtil.validChannelName(channel)
 				console.log "*** Invalid channel name ##{channel}"
 				socket.emit 'error', { msg: "Invalid channel. Must be alphanumeric & at most 25 characters long." }
 			else
-				theChannel = (channels[channel] ?= new Channel(that.sessionStore, channel))
+				theChannel = (channels[channel] ?= new Channel(sessionStore, channel))
 				
 				if theChannel.join sessionID
 					# TODO if we already were there?

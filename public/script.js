@@ -1,8 +1,12 @@
-var escapeHtml, execute, help, isCommand, join, mychannel, mynick, newNick, parseCommand, ping, say, show, socket,
+var escapeHtml, execute, help, isCommand, join, mychannel, mynick, names, newNick, parseCommand, ping, sanitize, say, show, socket,
   __slice = [].slice;
 
 escapeHtml = function(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+};
+
+sanitize = function(channel) {
+  return channel.replace(/^#+/, '');
 };
 
 ping = function() {
@@ -18,7 +22,15 @@ newNick = function(newNick) {
 };
 
 join = function(channel) {
+  channel = sanitize(channel);
   return socket.emit('join', {
+    channel: channel
+  });
+};
+
+names = function(channel) {
+  channel = sanitize(channel);
+  return socket.emit('names', {
     channel: channel
   });
 };
@@ -28,6 +40,7 @@ help = function(help) {
   show("*** /nick <nick> - change nick.");
   show("*** /say <message> - say on current channel.");
   show("*** /join <channel> - join a channel. Alias: /j");
+  show("*** /names [<channel>] - show who's on a channel");
   show("*** /help - here we are. Alias: /h");
   return show("*** /ping - ping the server.");
 };
@@ -36,7 +49,7 @@ say = function(channel, msg) {
   if (!(channel != null)) {
     return show("*** You're not on a channel - try joining one. /list shows available channels.");
   } else {
-    channel = channel.replace(/^#+/, '');
+    channel = sanitize(channel);
     return socket.emit('say', {
       channel: channel,
       msg: msg
@@ -69,7 +82,7 @@ parseCommand = function(cmd) {
 };
 
 execute = function(cmd) {
-  var args, command, _ref, _ref1;
+  var args, command, _ref, _ref1, _ref2;
   if (isCommand(cmd)) {
     _ref = parseCommand(cmd), command = _ref.command, args = _ref.args;
   } else {
@@ -86,6 +99,9 @@ execute = function(cmd) {
     case 'join':
     case 'j':
       return join(args[0]);
+    case 'names':
+    case 'n':
+      return names((_ref2 = args[0]) != null ? _ref2 : mychannel);
     case 'say':
     case 's':
       return say(mychannel, args);
@@ -116,8 +132,19 @@ $(function() {
   $('#msg').change(function() {
     return say($('#sayChannel').val(), $('#msg').val());
   });
+  socket.on('disconnect', function() {
+    return show("*** Disconnected from server. Please stand by as I'm trying to reconnect...");
+  });
   socket.on('connect', function() {
+    show("*** Connected to server.");
     return ping();
+  });
+  socket.on('names', function(_arg) {
+    var channel, names;
+    channel = _arg.channel, names = _arg.names;
+    names.sort();
+    show("*** There are " + names.length + " people on #" + channel + ":");
+    return show("*** " + (names.join(' ')));
   });
   socket.on('pong', function(data) {
     var backThen, now;
@@ -147,7 +174,8 @@ $(function() {
     nick = _arg.nick, channel = _arg.channel;
     show("*** " + nick + " has joined channel #" + channel + ".");
     if (nick === mynick) {
-      return $('#sayChannel').val(channel);
+      $('mychannel').val(channel);
+      return mychannel = channel;
     }
   });
   socket.on('say', function(_arg) {

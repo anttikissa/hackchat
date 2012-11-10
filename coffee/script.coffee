@@ -1,6 +1,12 @@
+# Utilities
+
 escapeHtml = (s) ->
 	s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 	.replace(/"/g, "&quot;") .replace(/'/g, "&#039;")
+
+# Remove any number of #'s from the beginning of the channel name.
+sanitize = (channel) ->
+	channel.replace /^#+/, ''
 
 ping = ->
 	socket.emit 'ping', ts: new Date().getTime()
@@ -9,7 +15,12 @@ newNick = (newNick) ->
 	socket.emit 'newNick', newNick: newNick
 
 join = (channel) ->
+	channel = sanitize channel
 	socket.emit 'join', channel: channel
+
+names = (channel) ->
+	channel = sanitize channel
+	socket.emit 'names', channel: channel
 
 help = (help) ->
 	show "*** Available commands:"
@@ -17,7 +28,7 @@ help = (help) ->
 #	show "*** /list - show channels"
 	show "*** /say <message> - say on current channel."
 	show "*** /join <channel> - join a channel. Alias: /j"
-#	show "*** /names [<channel>] - show who's on a channel"
+	show "*** /names [<channel>] - show who's on a channel"
 #	show "*** /whois [<nick>] - show info about a person"
 #	show "*** /leave [<channel>] - leave a channel (current channel by default)"
 #	show "*** /msg <nick> <message> - send private message to <nick>"
@@ -28,7 +39,7 @@ say = (channel, msg) ->
 	if not channel?
 		show "*** You're not on a channel - try joining one. /list shows available channels."
 	else
-		channel = channel.replace /^#+/, ''
+		channel = sanitize channel
 		socket.emit 'say', channel: channel, msg: msg
 
 show = (msg) ->
@@ -54,13 +65,13 @@ execute = (cmd) ->
 		when 'nick' then newNick args[0]
 		when 'ping' then ping()
 		when 'join', 'j' then join args[0]
+		when 'names', 'n' then names (args[0] ? mychannel)
 		when 'say', 's' then say mychannel, args
 		when 'help', 'h' then help args
 		else show "*** I don't know that command: #{command}."
 
 mynick = null
 mychannel = null
-#"#foo"
 
 $ ->
 	mynick = $('.mynick').html()
@@ -77,9 +88,18 @@ $ ->
 	$('#msg').change ->
 		say($('#sayChannel').val(), $('#msg').val())
 
+	socket.on 'disconnect', ->
+		show "*** Disconnected from server. Please stand by as I'm trying to reconnect..."
+
 	socket.on 'connect', ->
+		show "*** Connected to server."
 		ping()
 
+	socket.on 'names', ({ channel, names }) ->
+		names.sort()
+		show "*** There are #{names.length} people on ##{channel}:"
+		show "*** #{names.join ' '}"
+		
 	socket.on 'pong', (data) ->
 		backThen = data.ts
 		now = new Date().getTime()
@@ -98,8 +118,10 @@ $ ->
 
 	socket.on 'join', ({ nick, channel }) ->
 		show "*** #{nick} has joined channel ##{channel}."
+		# TODO This is not a tenable solution.
 		if nick == mynick
-			$('#sayChannel').val(channel)
+			$('mychannel').val(channel)
+			mychannel = channel
 
 	socket.on 'say', ({ nick, channel, msg }) ->
 		show "<#{nick} ##{channel}> #{msg}"

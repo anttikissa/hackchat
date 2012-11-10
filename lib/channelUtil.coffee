@@ -20,7 +20,7 @@ class Channel
 		result = []
 		membersLength = @members.length
 		for sessionID in @members
-			sessionStore.get sessionID, (err, session) ->
+			@sessionStore.get sessionID, (err, session) ->
 				if err
 					return cb err
 				result.push session
