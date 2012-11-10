@@ -47,6 +47,7 @@ $ ->
 	socket.on 'newNick', ({ newNick }) ->
 		show "Nick changed to #{newNick}"
 		$('.mynick').html(newNick)
+		mynick = newNick
 
 	socket.on 'error', ({ msg }) ->
 		show "*** #{msg}"
@@ -58,6 +59,9 @@ $ ->
 		show "*** #{nick} has joined channel ##{channel}."
 		if nick == mynick
 			$('#sayChannel').val(channel)
+
+	socket.on 'say', ({ nick, channel, msg }) ->
+		show "<#{nick} ##{channel}> #{msg}"
 
 socket = io.connect()
 

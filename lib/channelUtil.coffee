@@ -1,7 +1,8 @@
+sessions = require './sessions'
 
 # ...
 class Channel
-	constructor: ->
+	constructor: (@name) ->
 		# members are session ids.
 		@members = []
 
@@ -17,7 +18,10 @@ class Channel
 
 	emit: (what, data) ->
 		for sessionID in @members
-			console.log "### send #{what} to #{sessionID}..."
+			theSession = sessions[sessionID]
+			for socket, idx in theSession.connections
+				console.log "### send #{what} to #{sessionID}, socket #{idx}..."
+				socket.emit what, data
 		
 	hello: ->	
 		console.log "Hello channel!"

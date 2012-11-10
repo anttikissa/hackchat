@@ -3,6 +3,8 @@ _ = require 'underscore'
 nickUtil = require './nickUtil'
 channels = require './channels'
 channelUtil = require './channelUtil'
+sessions = require './sessions'
+
 Channel = channelUtil.Channel
 
 # Handles a connection with a single socket.io client (i.e. a browser window).
@@ -11,6 +13,10 @@ module.exports.connection = (sessionStore) ->
 	(socket) ->
 		sessionID = socket.handshake.sessionID
 		session = socket.handshake.session
+
+		# TODO if sessions[sessionID] does not exist... create it?
+		sessions[sessionID].newConnection(socket)
+
 		console.log "*** #{session.nick} @ #{socket.id} connected"
 
 		sessionStore.on "#{sessionID} updated", (newSession) ->
@@ -63,6 +69,7 @@ module.exports.connection = (sessionStore) ->
 		socket.on 'disconnect', ->
 			console.log "*** #{session.nick} @ #{socket.id} disconnected"
 			clearInterval greeter
+			sessions[sessionID].connectionClosed(socket)
 
 		socket.on 'join', ({ channel }) ->
 #			console.log "*** #{session.nick} wants to join ##{channel}"

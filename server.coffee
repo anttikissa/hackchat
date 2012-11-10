@@ -9,6 +9,10 @@ cookie = require 'cookie'
 parseSignedCookie = require('connect/lib/utils').parseSignedCookie
 _ = require 'underscore'
 
+sessions = require './lib/sessions'
+sessionUtil = require './lib/sessionUtil'
+Session = sessionUtil.Session
+
 app = express()
 server = http.createServer app
 io = sio.listen server
@@ -35,6 +39,10 @@ newNick = () ->
 	"anon_" + t.toString(26)
 
 app.use (req, resp, next) ->
+	# TODO what if a socket just reconnects (after server restart)
+
+	sessions[req.sessionID] ?= new Session(req.sessionID)
+
 	if not req.session.nick?
 		nick = newNick()
 		console.log "*** #{req.sessionID} is new user, giving nick #{nick}"

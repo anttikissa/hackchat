@@ -63,7 +63,8 @@ $(function() {
     var newNick;
     newNick = _arg.newNick;
     show("Nick changed to " + newNick);
-    return $('.mynick').html(newNick);
+    $('.mynick').html(newNick);
+    return mynick = newNick;
   });
   socket.on('error', function(_arg) {
     var msg;
@@ -75,13 +76,18 @@ $(function() {
     from = _arg.from, msg = _arg.msg;
     return show("<" + from + "> " + msg);
   });
-  return socket.on('join', function(_arg) {
+  socket.on('join', function(_arg) {
     var channel, nick;
     nick = _arg.nick, channel = _arg.channel;
     show("*** " + nick + " has joined channel #" + channel + ".");
     if (nick === mynick) {
       return $('#sayChannel').val(channel);
     }
+  });
+  return socket.on('say', function(_arg) {
+    var channel, msg, nick;
+    nick = _arg.nick, channel = _arg.channel, msg = _arg.msg;
+    return show("<" + nick + " #" + channel + "> " + msg);
   });
 });
 
