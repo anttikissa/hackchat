@@ -87,6 +87,10 @@ io.on 'connection', (socket) ->
 			else
 				session.nick = newNick
 				socket.emit 'newNick', { newNick: newNick }
+				sessionStore.set sessionID, session, (err) ->
+					if err
+						console.log "Error saving session #{sessionID}"
+
 		else
 			socket.emit 'error', { msg: "Invalid nick. Must be alphanumeric & at most 15 characters long." }
 
