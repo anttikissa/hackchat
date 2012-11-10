@@ -1,4 +1,4 @@
-var escapeHtml, execute, isCommand, join, mychannel, mynick, newNick, parseCommand, ping, say, show, socket,
+var escapeHtml, execute, help, isCommand, join, mychannel, mynick, newNick, parseCommand, ping, say, show, socket,
   __slice = [].slice;
 
 escapeHtml = function(s) {
@@ -21,6 +21,15 @@ join = function(channel) {
   return socket.emit('join', {
     channel: channel
   });
+};
+
+help = function(help) {
+  show("*** Available commands:");
+  show("*** /nick <nick> - change nick.");
+  show("*** /say <message> - say on current channel.");
+  show("*** /join <channel> - join a channel. Alias: /j");
+  show("*** /help - here we are. Alias: /h");
+  return show("*** /ping - ping the server.");
 };
 
 say = function(channel, msg) {
@@ -75,9 +84,14 @@ execute = function(cmd) {
     case 'ping':
       return ping();
     case 'join':
+    case 'j':
       return join(args[0]);
     case 'say':
+    case 's':
       return say(mychannel, args);
+    case 'help':
+    case 'h':
+      return help(args);
     default:
       return show("*** I don't know that command: " + command + ".");
   }

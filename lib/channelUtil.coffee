@@ -2,7 +2,7 @@ sessions = require './sessions'
 
 # ...
 class Channel
-	constructor: (@name) ->
+	constructor: (@sessionStore, @name) ->
 		# members are session ids.
 		@members = []
 
@@ -15,6 +15,18 @@ class Channel
 
 	has: (sessionID) ->
 		sessionID in @members
+	
+	sessions: (cb) ->
+		result = []
+		membersLength = @members.length
+		for sessionID in @members
+			sessionStore.get sessionID, (err, session) ->
+				if err
+					return cb err
+				result.push session
+				if result.length == membersLength
+					return cb null, result
+				
 
 	emit: (what, data) ->
 		for sessionID in @members

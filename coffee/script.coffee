@@ -11,6 +11,19 @@ newNick = (newNick) ->
 join = (channel) ->
 	socket.emit 'join', channel: channel
 
+help = (help) ->
+	show "*** Available commands:"
+	show "*** /nick <nick> - change nick."
+#	show "*** /list - show channels"
+	show "*** /say <message> - say on current channel."
+	show "*** /join <channel> - join a channel. Alias: /j"
+#	show "*** /names [<channel>] - show who's on a channel"
+#	show "*** /whois [<nick>] - show info about a person"
+#	show "*** /leave [<channel>] - leave a channel (current channel by default)"
+#	show "*** /msg <nick> <message> - send private message to <nick>"
+	show "*** /help - here we are. Alias: /h"
+	show "*** /ping - ping the server."
+
 say = (channel, msg) ->
 	if not channel?
 		show "*** You're not on a channel - try joining one. /list shows available channels."
@@ -40,8 +53,9 @@ execute = (cmd) ->
 	switch command
 		when 'nick' then newNick args[0]
 		when 'ping' then ping()
-		when 'join' then join args[0]
-		when 'say' then say mychannel, args
+		when 'join', 'j' then join args[0]
+		when 'say', 's' then say mychannel, args
+		when 'help', 'h' then help args
 		else show "*** I don't know that command: #{command}."
 
 mynick = null
