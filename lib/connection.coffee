@@ -4,6 +4,7 @@ nickUtil = require './nickUtil'
 channels = require './channels'
 channelUtil = require './channelUtil'
 sessions = require './sessions'
+Session = require('./sessionUtil').Session
 
 Channel = channelUtil.Channel
 
@@ -14,7 +15,7 @@ module.exports.connection = (sessionStore) ->
 		sessionID = socket.handshake.sessionID
 		session = socket.handshake.session
 
-		# TODO if sessions[sessionID] does not exist... create it?
+		sessions[sessionID] ?= new Session(sessionID)
 		sessions[sessionID].newConnection(socket)
 
 		console.log "*** #{session.nick} @ #{socket.id} connected"

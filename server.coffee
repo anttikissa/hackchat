@@ -31,7 +31,10 @@ app.use express.favicon()
 app.use express.logger()
 app.use express.cookieParser(secret)
 app.use express.session(key: 's', store: sessionStore)
-app.use compiler(enabled: ['coffee'], src: 'coffee', dest: 'public')
+app.use compiler {
+	enabled: ['coffee', 'less'],
+	roots: [['coffee', 'public'], ['styles', 'public']]
+}
 app.use express.static('public')
 
 newNick = () ->
@@ -39,10 +42,6 @@ newNick = () ->
 	"anon_" + t.toString(26)
 
 app.use (req, resp, next) ->
-	# TODO what if a socket just reconnects (after server restart)
-
-	sessions[req.sessionID] ?= new Session(req.sessionID)
-
 	if not req.session.nick?
 		nick = newNick()
 		console.log "*** #{req.sessionID} is new user, giving nick #{nick}"
