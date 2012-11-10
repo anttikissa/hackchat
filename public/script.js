@@ -1,4 +1,5 @@
-var escapeHtml, join, mynick, newNick, ping, say, show, socket;
+var escapeHtml, execute, isCommand, join, mynick, newNick, parseCommand, ping, say, show, socket,
+  __slice = [].slice;
 
 escapeHtml = function(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -31,6 +32,40 @@ say = function(channel, msg) {
 
 show = function(msg) {
   return $('.chat').append("<p>" + (escapeHtml(msg)) + "</p>");
+};
+
+isCommand = function(cmd) {
+  return cmd.match(/^\//);
+};
+
+parseCommand = function(cmd) {
+  var args, command, _ref;
+  _ref = cmd.split(/\s+/), command = _ref[0], args = 2 <= _ref.length ? __slice.call(_ref, 1) : [];
+  if (command === '/') {
+    return {
+      command: 'say',
+      args: cmd.replace(/^\/\s+/, '')
+    };
+  } else {
+    return {
+      command: command.replace(/^\//, ''),
+      args: args
+    };
+  }
+};
+
+execute = function(cmd) {
+  var args, command, _ref, _ref1;
+  if (isCommand(cmd)) {
+    _ref = parseCommand(cmd), command = _ref.command, args = _ref.args;
+  } else {
+    _ref1 = {
+      command: 'say',
+      args: cmd
+    }, command = _ref1.command, args = _ref1.args;
+  }
+  console.log("COMMAND " + command + ".");
+  return console.log("ARGS " + (JSON.stringify(args)) + ".");
 };
 
 mynick = null;
@@ -88,7 +123,15 @@ $(function() {
     nick = _arg.nick, channel = _arg.channel, msg = _arg.msg;
     return show("<" + nick + " #" + channel + "> " + msg);
   });
-  return $('#cmd').focus();
+  $('#cmd').focus();
+  return $('#cmd').keypress(function(event) {
+    var cmd;
+    if (event.keyCode === 13) {
+      cmd = $(event.target).val();
+      execute(cmd);
+      return $(event.target).val('');
+    }
+  });
 });
 
 socket = io.connect();

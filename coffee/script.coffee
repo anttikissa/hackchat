@@ -17,6 +17,25 @@ say = (channel, msg) ->
 show = (msg) ->
 	$('.chat').append "<p>#{escapeHtml msg}</p>"
 
+isCommand = (cmd) ->
+	cmd.match /^\//
+
+parseCommand = (cmd) ->
+	[command, args...] = cmd.split /\s+/
+	if command == '/'
+		{ command: 'say', args: cmd.replace(/^\/\s+/, '') }
+	else
+		{ command: command.replace(/^\//, ''), args: args }
+
+execute = (cmd) ->
+	if isCommand cmd
+		{ command, args } = parseCommand cmd
+	else
+		{ command, args } = { command: 'say', args: cmd }
+
+	console.log "COMMAND #{command}."
+	console.log "ARGS #{JSON.stringify args}."
+
 mynick = null
 
 $ ->
@@ -62,6 +81,12 @@ $ ->
 		show "<#{nick} ##{channel}> #{msg}"
 
 	$('#cmd').focus()
+
+	$('#cmd').keypress (event) ->
+		if event.keyCode == 13
+			cmd = $(event.target).val()
+			execute(cmd)
+			$(event.target).val('')
 
 socket = io.connect()
 

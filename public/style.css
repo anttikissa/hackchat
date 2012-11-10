@@ -138,9 +138,7 @@ body {
   margin: 0 2em 2em 2em;
   background: #eee;
   padding: 1em;
-}
-.hide {
-  display: none;
+  border: 1px solid black;
 }
 .input td.pre {
   white-space: nowrap;
