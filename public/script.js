@@ -299,7 +299,7 @@ initSocket = function() {
 };
 
 $(function() {
-  var clicks, focus, initialChannels, timer;
+  var c, clicks, focus, initialChannels, timer, _i, _len, _results;
   mynick = $('.mynick').html();
   initSocket();
   focus = function() {
@@ -339,6 +339,16 @@ $(function() {
       return $(event.target).val('');
     }
   });
-  initialChannels = window.location.hash;
-  return console.log("initials " + initialChannels);
+  initialChannels = (window.location.hash.replace(/^#/, '')).trim().split(',');
+  console.log("initials " + (JSON.stringify(initialChannels)));
+  _results = [];
+  for (_i = 0, _len = initialChannels.length; _i < _len; _i++) {
+    c = initialChannels[_i];
+    if (c) {
+      _results.push(join(c));
+    } else {
+      _results.push(void 0);
+    }
+  }
+  return _results;
 });

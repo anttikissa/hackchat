@@ -253,6 +253,10 @@ $ ->
 			execute(cmd)
 			$(event.target).val('')
 
-	initialChannels = window.location.hash
-	console.log "initials #{initialChannels}"
+	initialChannels = (window.location.hash.replace /^#/, '').trim().split ','
+
+	console.log "initials #{JSON.stringify initialChannels}"
+	for c in initialChannels
+		if c
+			join c
 
