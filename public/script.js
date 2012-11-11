@@ -209,10 +209,8 @@ execute = function(cmd) {
     case 'part':
       return leave((_ref3 = args[0]) != null ? _ref3 : mychannel);
     case 'next':
-    case 'n':
       return next();
     case 'prev':
-    case 'n':
       return prev();
     default:
       return show("*** I don't know that command: " + command + ".");
@@ -277,7 +275,6 @@ initSocket = function() {
         tellUser = false;
       } else {
         addChannel(channel);
-        show("*** channels this socket is on: " + (channels.join(' ')));
       }
     }
     if (tellUser) {

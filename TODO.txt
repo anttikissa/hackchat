@@ -3,7 +3,9 @@
 
 Ctrl-X
 
-Make scrolling work
+Don't be so jumpy, title bar.
+
+Make scrolling work.
 
 Mouse click anywhere to focus the command line.
 

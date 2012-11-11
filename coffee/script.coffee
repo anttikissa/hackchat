@@ -199,7 +199,7 @@ initSocket = () ->
 				tellUser = false
 			else
 				addChannel channel
-				show "*** channels this socket is on: #{channels.join ' '}"
+#				show "*** channels this socket is on: #{channels.join ' '}"
 
 		if tellUser
 			show "*** #{nick} has joined channel ##{channel}."
