@@ -7,8 +7,8 @@ class Session
 	constructor: (@sessionID) ->
 		# connections are sockets.
 		@connections = []
-		# channels are ids.
-		# should be objects with a list of connections, possibly?
+		# channels maps channel names to a list of socket ids listening
+		# to that channel.
 		@channels = {}
 
 	joinChannel: (channel, socket) ->
@@ -59,7 +59,17 @@ class Session
 	connectionClosed: (socket) ->
 		@connections = _.reject @connections, (aSocket) ->
 			aSocket.id == socket.id
-		console.log "*** Socket closed! Now session #{@sessionID} has #{@connections.length} connections."
+		# TODO remove from all channels
+#		console.log "*** 1. @channels is now #{JSON.stringify @channels}"
+		for channel, connections of @channels
+#			console.log "### CLOSED, removing #{socket.id} from channel #{channel}"
+			@channels[channel] = _.without connections, socket.id
+
+		if @channels[channel].length == 0
+			delete @channels[channel]
+
+#		console.log "*** 2. @channels is now #{JSON.stringify @channels}"
+#		console.log "*** Socket closed! Now session #{@sessionID} has #{@connections.length} connections."
 
 module.exports.Session = Session
 

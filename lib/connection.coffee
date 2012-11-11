@@ -27,19 +27,20 @@ module.exports.connection = (sessionStore) ->
 
 		sessionStore.on "#{sessionID} updated", (newSession) ->
 			oldSession = session
-			console.log "*** #{session.nick} @ #{socket.id}, updating session..."
+#			console.log "*** #{session.nick} @ #{socket.id}, updating session..."
 			session = newSession
-			console.log "*** #{session.nick} @ #{socket.id}, session updated."
+#			console.log "*** #{session.nick} @ #{socket.id}, session updated."
 
 			if session.nick != oldSession.nick
+				console.log "*** #{oldSession.nick} is now known as #{session.nick}"
 				data =
 					oldNick: oldSession.nick
 					newNick: session.nick
 				for channel in theSession.channels
-					console.log "*** emitting nick change to channel #{channel}"
+#					console.log "*** emitting nick change to channel #{channel}"
 					channels[channel].emit 'newNick', data
 				if theSession.channels.length == 0
-					console.log "*** not on channels, emitting nick change"
+#					console.log "*** not on channels, emitting nick change"
 					socket.emit 'newNick', data
 
 		greeter = setInterval(->

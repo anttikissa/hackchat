@@ -1,6 +1,8 @@
 
 # Items to do
 
+http://.../#foo doesn't work on a fresh server
+ 
 Nick collisions
 
 Remove pings and greeter
