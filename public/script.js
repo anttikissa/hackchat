@@ -160,7 +160,7 @@ say = function(channel, msg) {
 
 show = function(msg) {
   $('.chat').append("<p>" + (escapeHtml(msg)) + "</p>");
-  return $('.chat').scrollTop(10000);
+  return $('.chat').scrollTop(1000000);
 };
 
 isCommand = function(cmd) {
@@ -197,7 +197,7 @@ up = function() {
   } else {
     $('#cmd').val(history[historyIdx]);
   }
-  return $('#cmd')[0].setSelectionRange(1000, 1000);
+  return $('#cmd')[0].setSelectionRange(10000, 10000);
 };
 
 down = function() {
@@ -214,7 +214,7 @@ down = function() {
   } else {
     $('#cmd').val(history[historyIdx]);
   }
-  return $('#cmd')[0].setSelectionRange(1000, 1000);
+  return $('#cmd')[0].setSelectionRange(10000, 10000);
 };
 
 execute = function(cmd) {
