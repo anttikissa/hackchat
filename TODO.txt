@@ -1,12 +1,29 @@
 
-why is reconnect broken?
+# Items to do
 
-nick change propagation
+Make scrolling work
+
+/join foo - you're already on that channel!
+    Should just add channel to the current connection/socket.
+
+    And it shouldn't be the default.
+
+Nick change propagation
+
 /list
-topics
+
+Topics
 
 The big channel-connection association thing - what does it mean to be on a
 channel?
 
 /whois
+
+Add timestamps to output
+
+
+# Solved in some way
+
+Why is reconnect broken?
+    - fixed with a inglorious socket.io hack - get back to this later
 

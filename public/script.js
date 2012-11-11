@@ -1,5 +1,9 @@
-var escapeHtml, execute, help, isCommand, join, mychannel, mynick, names, newNick, parseCommand, ping, sanitize, say, show, socket,
+var connected, escapeHtml, execute, help, initSocket, isCommand, join, mychannel, mynick, names, newNick, parseCommand, ping, reconnect, sanitize, say, show, socket,
   __slice = [].slice;
+
+connected = false;
+
+socket = io.connect();
 
 escapeHtml = function(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -33,12 +37,33 @@ names = function(channel) {
     channel = mychannel;
   }
   if (!channel) {
-    show('*** Please specify channel.');
+    return show('*** Please specify channel.');
+  } else {
+    channel = sanitize(channel);
+    return socket.emit('names', {
+      channel: channel
+    });
   }
-  channel = sanitize(channel);
-  return socket.emit('names', {
-    channel: channel
-  });
+};
+
+reconnect = function() {
+  var uri, uuri;
+  if (connected) {
+    show("*** Disconnecting.");
+    socket.disconnect();
+  }
+  uri = io.util.parseUri();
+  uuri = null;
+  if (window && window.location) {
+    uri.protocol = uri.protocol || window.location.protocol.slice(0, -1);
+    uri.host = uri.host || (window.document ? window.document.domain : window.location.hostname);
+    uri.port = uri.port || window.location.port;
+  }
+  uuri = io.util.uniqueUri(uri);
+  show("*** Reconnecting to " + uuri + ".");
+  delete io.sockets[uuri];
+  socket = io.connect();
+  return initSocket();
 };
 
 help = function(help) {
@@ -117,7 +142,8 @@ execute = function(cmd) {
       return help(args);
     case 'reconnect':
     case 're':
-      return io.connect();
+    case 'reco':
+      return reconnect();
     default:
       return show("*** I don't know that command: " + command + ".");
   }
@@ -127,26 +153,14 @@ mynick = null;
 
 mychannel = null;
 
-$(function() {
-  var focus;
-  mynick = $('.mynick').html();
-  $('#ping').click(function() {
-    return ping();
-  });
-  $('#nick').change(function() {
-    return newNick($('#nick').val());
-  });
-  $('#channel').change(function() {
-    return join($('#channel').val());
-  });
-  $('#msg').change(function() {
-    return say($('#sayChannel').val(), $('#msg').val());
-  });
+initSocket = function() {
   socket.on('disconnect', function() {
-    return show("*** Disconnected from server. Please stand by as I'm trying to reconnect...");
+    show("*** Disconnected from server.");
+    return connected = false;
   });
   socket.on('connect', function() {
     show("*** Connected to server.");
+    connected = true;
     return ping();
   });
   socket.on('names', function(_arg) {
@@ -173,7 +187,10 @@ $(function() {
       return show("*** " + oldNick + " is now known as " + newNick + ".");
     }
   });
-  socket.on('error', function(_arg) {
+  socket.on('error', function(data) {
+    return show("*** Failed to reconnect. Please try again later.");
+  });
+  socket.on('info', function(_arg) {
     var msg;
     msg = _arg.msg;
     return show("*** " + msg);
@@ -192,10 +209,28 @@ $(function() {
       return mychannel = channel;
     }
   });
-  socket.on('say', function(_arg) {
+  return socket.on('say', function(_arg) {
     var channel, msg, nick;
     nick = _arg.nick, channel = _arg.channel, msg = _arg.msg;
     return show("<" + nick + " #" + channel + "> " + msg);
+  });
+};
+
+$(function() {
+  var focus;
+  mynick = $('.mynick').html();
+  initSocket();
+  $('#ping').click(function() {
+    return ping();
+  });
+  $('#nick').change(function() {
+    return newNick($('#nick').val());
+  });
+  $('#channel').change(function() {
+    return join($('#channel').val());
+  });
+  $('#msg').change(function() {
+    return say($('#sayChannel').val(), $('#msg').val());
   });
   focus = function() {
     return $('#cmd').focus();
@@ -210,5 +245,3 @@ $(function() {
     }
   });
 });
-
-socket = io.connect();

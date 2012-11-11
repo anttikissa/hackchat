@@ -45,12 +45,12 @@ module.exports.connection = (sessionStore) ->
 		socket.on 'newNick', ({ newNick }) ->
 #			console.log "*** #{session.nick} wants new nick: #{JSON.stringify newNick}"
 			if newNick == session.nick
-				socket.emit 'error', { msg: "You're already known as #{newNick}." }
+				socket.emit 'info', { msg: "You're already known as #{newNick}." }
 				return
 
 			if nickUtil.validNick newNick
 				if nickUtil.nickTaken newNick
-					socket.emit 'error', { msg: "Nick already in use." }
+					socket.emit 'info', { msg: "Nick already in use." }
 				else
 					newSession = _.extend {}, session, nick: newNick
 
@@ -60,7 +60,7 @@ module.exports.connection = (sessionStore) ->
 					sessionStore.emit("#{sessionID} updated", newSession)
 
 			else
-				socket.emit 'error', { msg: "Invalid nick. Must be alphanumeric & at most 15 characters long." }
+				socket.emit 'info', { msg: "Invalid nick. Must be alphanumeric & at most 15 characters long." }
 
 		socket.on 'say', ({ channel, msg }) ->
 			if channels[channel]?.has sessionID
@@ -70,7 +70,7 @@ module.exports.connection = (sessionStore) ->
 					channel: channel,
 					msg: msg
 			else
-				socket.emit 'error', { msg: "You're not on #{channel}. Cannot say." }
+				socket.emit 'info', { msg: "You're not on #{channel}. Cannot say." }
 
 		socket.on 'disconnect', ->
 			console.log "*** #{session.nick} @ #{socket.id} disconnected"
@@ -82,7 +82,7 @@ module.exports.connection = (sessionStore) ->
 				channels[channel].sessions (err, sessions) ->
 					socket.emit 'names', { channel: channel, names: _.pluck sessions, 'nick' }
 			else
-				socket.emit 'error', { msg: "No such channel #{channel}. Better luck next time." }
+				socket.emit 'info', { msg: "No such channel #{channel}. Better luck next time." }
 
 		socket.on 'names', ({ channel }) ->
 			names channel
@@ -92,7 +92,7 @@ module.exports.connection = (sessionStore) ->
 
 			if not channelUtil.validChannelName(channel)
 				console.log "*** Invalid channel name ##{channel}"
-				socket.emit 'error', { msg: "Invalid channel. Must be alphanumeric & at most 25 characters long." }
+				socket.emit 'info', { msg: "Invalid channel. Must be alphanumeric & at most 25 characters long." }
 			else
 				theChannel = (channels[channel] ?= new Channel(sessionStore, channel))
 				
@@ -103,8 +103,9 @@ module.exports.connection = (sessionStore) ->
 					theChannel.emit 'join', { nick: session.nick, channel: channel }
 					names channel
 				else
-					socket.emit 'error', { msg: "You're already on that channel!" }
+					socket.emit 'info', { msg: "You're already on that channel!" }
 
+		socket.emit 'info', { msg: "Welcome to HackChat!" }
 
 #			if channels[channel]?
 
