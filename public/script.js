@@ -218,6 +218,9 @@ down = function() {
 
 execute = function(cmd) {
   var args, command, _ref, _ref1, _ref2, _ref3;
+  if (cmd.match(/^\s*$/)) {
+    return;
+  }
   history.push(cmd);
   historyIdx = history.length;
   newestCommand = '';
@@ -402,12 +405,18 @@ $(function() {
       $('#cmd').focus();
     }
     if (e.ctrlKey && e.keyCode === 24) {
-      return next();
+      if (e.shiftKey) {
+        prev();
+      } else {
+        next();
+      }
+    }
+    if (e.ctrlKey && e.keyCode === 21) {
+      return $('#cmd').val('');
     }
   });
   $('#cmd').keydown(function(event) {
     var cmd;
-    console.log(event);
     if (event.keyCode === 13) {
       cmd = $(event.target).val();
       execute(cmd);

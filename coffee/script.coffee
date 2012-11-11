@@ -164,6 +164,9 @@ down = ->
 	$('#cmd')[0].setSelectionRange(1000, 1000)
 
 execute = (cmd) ->
+	if cmd.match /^\s*$/
+		return
+
 	history.push cmd
 	historyIdx = history.length
 	newestCommand = ''
@@ -299,11 +302,14 @@ $ ->
 	$(window).keypress (e) ->
 		if e.target.id != 'cmd'
 			$('#cmd').focus()
+		# Ctrl-X
 		if e.ctrlKey && e.keyCode == 24
-			next()
+			if e.shiftKey then prev() else next()
+		# Ctrl-U
+		if e.ctrlKey && e.keyCode == 21
+			$('#cmd').val('')
 
 	$('#cmd').keydown (event) ->
-		console.log event
 		if event.keyCode == 13
 			cmd = $(event.target).val()
 			execute(cmd)
