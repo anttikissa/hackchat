@@ -244,9 +244,10 @@ $ ->
 			,	300)
 
 	$(window).keypress (e) ->
-		console.log e
-		if (e.target.id != 'cmd')
+		if e.target.id != 'cmd'
 			$('#cmd').focus()
+		if e.ctrlKey && e.keyCode == 24
+			next()
 
 	$('#cmd').keypress (event) ->
 		if event.keyCode == 13

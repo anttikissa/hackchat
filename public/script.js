@@ -326,9 +326,11 @@ $(function() {
     }
   });
   $(window).keypress(function(e) {
-    console.log(e);
     if (e.target.id !== 'cmd') {
-      return $('#cmd').focus();
+      $('#cmd').focus();
+    }
+    if (e.ctrlKey && e.keyCode === 24) {
+      return next();
     }
   });
   return $('#cmd').keypress(function(event) {
