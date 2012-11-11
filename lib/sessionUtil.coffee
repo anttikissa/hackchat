@@ -20,7 +20,6 @@ class Session
 #		@channels.push channel unless @channels in channel
 		console.log "*** #{@sessionID} joins channel #{channel} with #{socket.id}."
 		console.log "*** @channels is now #{JSON.stringify @channels}"
-		# TODO do whatever with the connection
 
 	# Whether we should send data from channel to the given socket
 	# what belongs to this session.  If it sounds a bit complicated, it is.
@@ -59,7 +58,6 @@ class Session
 	connectionClosed: (socket) ->
 		@connections = _.reject @connections, (aSocket) ->
 			aSocket.id == socket.id
-		# TODO remove from all channels
 #		console.log "*** 1. @channels is now #{JSON.stringify @channels}"
 		for channel, connections of @channels
 #			console.log "### CLOSED, removing #{socket.id} from channel #{channel}"
