@@ -129,16 +129,23 @@ table {
 .text {
   font-size: 16px;
   font-family: 'Courier New', Courier, monospace;
+  line-height: 20px;
 }
 body {
   font-size: 16px;
   font-family: 'Courier New', Courier, monospace;
+  line-height: 20px;
 }
 .page {
   margin: 0 2em 2em 2em;
   background: #eee;
   padding: 1em;
   border: 1px solid black;
+  border-top: none;
+}
+.input {
+  margin-left: -1px;
+  margin-top: -3px;
 }
 .input td.pre {
   white-space: nowrap;
@@ -149,6 +156,7 @@ body {
   border: none;
   font-size: 16px;
   font-family: 'Courier New', Courier, monospace;
+  line-height: 20px;
 }
 .input input:focus {
   outline: none;
