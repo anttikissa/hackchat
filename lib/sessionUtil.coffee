@@ -65,7 +65,7 @@ class Session
 #			console.log "### CLOSED, removing #{socket.id} from channel #{channel}"
 			@channels[channel] = _.without connections, socket.id
 
-		if @channels[channel].length == 0
+		if @channels[channel] && @channels[channel].length == 0
 			delete @channels[channel]
 
 #		console.log "*** 2. @channels is now #{JSON.stringify @channels}"
