@@ -22,6 +22,21 @@ class Session
 		console.log "*** @channels is now #{JSON.stringify @channels}"
 		# TODO do whatever with the connection
 
+	# Whether we should send data from channel to the given socket
+	# what belongs to this session.  If it sounds a bit complicated, it is.
+	# "Sorry to write such a long letter; I didn't have the time to write a
+	# short one."
+	isSocketListeningTo: (socket, channel) ->
+#		console.log "### isSocketListeningTo #{socket.id}, #{channel}"
+#		console.log "*** @channels is now #{JSON.stringify @channels}"
+		if not @channels[channel]
+#			console.log "### false"
+			false
+		else
+			result = socket.id in @channels[channel]
+#			console.log "### it's #{result}"
+			result
+
 	# Return whether we're leaving for good.
 	leaveChannel: (channel, socket) ->
 		if @channels[channel]

@@ -37,11 +37,13 @@ class Channel
 				
 
 	emit: (what, data) ->
+#		console.log "*** Channel ##{@name} emitting #{what}: #{JSON.stringify data}"
 		for sessionID in @members
 			theSession = sessions[sessionID]
-			for socket, idx in theSession.connections
-#				console.log "### send #{what} to #{sessionID}, socket #{idx}..."
-				socket.emit what, data
+			for socket in theSession.connections
+#				console.log "*** Considering socket #{socket.id}."
+				if theSession.isSocketListeningTo socket, @name
+					socket.emit what, data
 		
 	hello: ->	
 		console.log "Hello channel!"
