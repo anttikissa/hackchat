@@ -1,0 +1,12 @@
+
+why is reconnect broken?
+
+nick change propagation
+/list
+topics
+
+The big channel-connection association thing - what does it mean to be on a
+channel?
+
+/whois
+
