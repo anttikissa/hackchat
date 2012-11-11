@@ -1,10 +1,6 @@
 
 # Items to do
 
-Ctrl-X
-
-Show something instead of empty topic.
-
 Nick collisions
 
 Remove pings and greeter
@@ -17,8 +13,6 @@ Private messages.
     Should just add channel to the current connection/socket.
 
     And it shouldn't be the default.
-
-Nick change propagation
 
 /list
 
@@ -35,7 +29,7 @@ Any unique prefix of a command should work
 
 
 
-# Solved in some way
+# To do... later
 
 Why is reconnect broken?
     - fixed with a inglorious socket.io hack - get back to this later

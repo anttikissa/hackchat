@@ -32,11 +32,10 @@ module.exports.connection = (sessionStore) ->
 			console.log "*** #{session.nick} @ #{socket.id}, session updated."
 
 			if session.nick != oldSession.nick
-				# TODO find out all channels of this session
-				# then emit to them
-				socket.emit 'newNick',
-					oldNick: oldSession.nick
-					newNick: session.nick
+				for channel in theSession.channels
+					channels[channel].emit 'newNick',
+						oldNick: oldSession.nick
+						newNick: session.nick
 
 		greeter = setInterval(->
 			console.log "Saying hello to #{session.nick} @ #{socket.id}"
@@ -115,9 +114,9 @@ module.exports.connection = (sessionStore) ->
 			channel = sanitize channel
 			console.log "*** #{session.nick} leaving channel #{channel}, socket #{socket.id}"
 			if channels[channel]?
+				channels[channel].emit 'leave', { nick: session.nick, channel: channel }
 				channels[channel].leave sessionID
 				theSession.leaveChannel channel, socket
-				socket.emit 'leave', { nick: session.nick, channel: channel }
 			else
 				console.log "*** #[socketID} tried to leave non-existing channel #{channel}"
 
