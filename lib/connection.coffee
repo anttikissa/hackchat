@@ -99,6 +99,7 @@ module.exports.connection = (sessionStore) ->
 				chans[idx] = "#" + chan
 
 			socket.emit 'info', { msg: "All channels: #{chans.join ' '}" }
+			showPopulars()
 
 		socket.on 'disconnect', ->
 			console.log "*** #{session.nick} @ #{socket.id} disconnected"
