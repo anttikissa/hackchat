@@ -12,14 +12,14 @@ class Channel
 			false
 		else
 			@members.push sessionID
-			console.log "*** Channel #{@name} adding #{sessionID} from books"
-			console.log "*** Now have #{@members.length} members"
+			console.log "*** Channel #{@name} adding #{sessionID}"
+			console.log "*** Now have users: #{@members.join ' '}"
 			true
 	
 	leave: (sessionID) ->
 		@members = _.without @members, sessionID
-		console.log "*** Channel #{@name} removing #{sessionID} from books"
-		console.log "*** Now have #{@members.length} members"
+		console.log "*** Channel #{@name} removing #{sessionID}"
+		console.log "*** Now have users: #{@members.join ' '}"
 
 	has: (sessionID) ->
 		sessionID in @members
@@ -40,7 +40,7 @@ class Channel
 		for sessionID in @members
 			theSession = sessions[sessionID]
 			for socket, idx in theSession.connections
-				console.log "### send #{what} to #{sessionID}, socket #{idx}..."
+#				console.log "### send #{what} to #{sessionID}, socket #{idx}..."
 				socket.emit what, data
 		
 	hello: ->	

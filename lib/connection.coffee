@@ -106,22 +106,31 @@ module.exports.connection = (sessionStore) ->
 			else
 				theChannel = (channels[channel] ?= new Channel(sessionStore, channel))
 				if theChannel.join sessionID
-					# TODO if we already were there?
-					# better to push this logic into Channel?
 					console.log "*** Channel #{channel}: #{theChannel.members.join ' '}"
 					theChannel.emit 'join', { nick: session.nick, channel: channel }
 					names channel
-					theSession.joinChannel channel, socket
 				else
 					socket.emit 'join', { nick: session.nick, channel: channel }
+
+				theSession.joinChannel channel, socket
 
 		socket.on 'leave', ({ channel }) ->
 			channel = sanitize channel
 			console.log "*** #{session.nick} leaving channel #{channel}, socket #{socket.id}"
 			if channels[channel]?
-				channels[channel].emit 'leave', { nick: session.nick, channel: channel }
-				channels[channel].leave sessionID
-				theSession.leaveChannel channel, socket
+				data =
+					nick: session.nick
+					channel: channel
+
+				if theSession.leaveChannel channel, socket
+					channels[channel].leave sessionID
+					channels[channel].emit 'leave', data
+				# TODO this causes the connection to think that it has "left"
+				# the channel even if the session is on that channel on another
+				# connection.  This is required so that channel is removed from
+				# that client, but it may seem confusing.  ("I left the channel,
+				# but I am still on it in another window... wtf")
+				socket.emit 'leave', data
 			else
 				console.log "*** #[socketID} tried to leave non-existing channel #{channel}"
 

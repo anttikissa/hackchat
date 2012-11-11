@@ -9,17 +9,33 @@ class Session
 		@connections = []
 		# channels are ids.
 		# should be objects with a list of connections, possibly?
-		@channels = []
+		@channels = {}
 
-	joinChannel: (channel, connection) ->
-		@channels.push channel unless @channels in channel
-		console.log "*** #{@sessionID} joins channel #{channel}"
+	joinChannel: (channel, socket) ->
+		if not @channels[channel]
+			@channels[channel] = [socket.id]
+		else
+			@channels[channel].push socket.id unless socket.id in @channels[channel]
+
+#		@channels.push channel unless @channels in channel
+		console.log "*** #{@sessionID} joins channel #{channel} with #{socket.id}."
+		console.log "*** @channels is now #{JSON.stringify @channels}"
 		# TODO do whatever with the connection
 
-	leaveChannel: (channel, connection) ->
-		@channels = _.reject @channels, (aChannel) ->
-			aChannel == channel
-		# TODO handle the connection again...
+	# Return whether we're leaving for good.
+	leaveChannel: (channel, socket) ->
+		if @channels[channel]
+			@channels[channel] = _.without @channels[channel], socket.id
+			
+		if @channels[channel].length == 0
+			delete @channels[channel]
+			result = true
+		else
+			result = false
+
+		console.log "*** #{@sessionID} leaves channel #{channel} with #{socket.id}"
+		console.log "*** @channels is now #{JSON.stringify @channels}"
+		result
 
 	newConnection: (socket) ->
 		@connections.push socket
