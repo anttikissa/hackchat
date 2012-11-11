@@ -61,12 +61,12 @@ join = (channel) ->
 	channel = sanitize channel
 	socket.emit 'join', channel: channel
 
-leave = (channel) ->
+leave = (channel, message) ->
 	if not channel
 		show '*** Please specify channel.'
 	else
 		channel = sanitize channel
-		socket.emit 'leave', channel: channel
+		socket.emit 'leave', channel: channel, message: message || "leaving"
 
 names = (channel) ->
 	if not channel
@@ -106,7 +106,7 @@ help = (help) ->
 	show "*** /next - next channel (shortcut: Ctrl-X)"
 	show "*** /prev - previous channel"
 #	show "*** /whois [<nick>] - show info about a person"
-	show "*** /leave [<channel>] - leave a channel (current channel by default)"
+	show "*** /leave [<channel>] [<message>] - leave a channel (current channel by default)"
 #	show "*** /msg <nick> <message> - send private message to <nick>"
 	show "*** /help - here we are. Alias: /h"
 	show "*** /ping - ping the server."
@@ -146,7 +146,7 @@ execute = (cmd) ->
 		when 'say', 's' then say mychannel, args
 		when 'help', 'h' then help args
 		when 'reconnect', 're', 'reco' then reconnect()
-		when 'leave', 'le', 'part' then leave args[0] ? mychannel
+		when 'leave', 'le', 'part' then leave(args[0] ? mychannel, args[1..].join ' ')
 		when 'next' then next()
 		when 'prev' then prev()
 		else show "*** I don't know that command: #{command}."
@@ -219,8 +219,8 @@ initSocket = () ->
 		if tellUser
 			show "*** #{nick} has joined channel ##{channel}."
 
-	socket.on 'leave', ({ nick, channel }) ->
-		show "*** #{nick} has left channel ##{channel}."
+	socket.on 'leave', ({ nick, channel, message }) ->
+		show "*** #{nick} has left channel ##{channel} (#{message})."
 
 		if nick == mynick
 			nextChannel = removeChannel channel

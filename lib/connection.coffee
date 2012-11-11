@@ -37,10 +37,10 @@ module.exports.connection = (sessionStore) ->
 					oldNick: oldSession.nick
 					newNick: session.nick
 				for channel in theSession.channels
-#					console.log "*** emitting nick change to channel #{channel}"
+					console.log "*** emitting nick change to channel #{channel}"
 					channels[channel].emit 'newNick', data
 				if theSession.channels.length == 0
-#					console.log "*** not on channels, emitting nick change"
+					console.log "*** not on channels, emitting nick change"
 					socket.emit 'newNick', data
 
 #		greeter = setInterval(->
@@ -84,7 +84,11 @@ module.exports.connection = (sessionStore) ->
 
 		socket.on 'disconnect', ->
 			console.log "*** #{session.nick} @ #{socket.id} disconnected"
-#			clearInterval greeter
+
+			for channel of theSession.channels
+				leave { channel: channel, message: "disconnected" }
+				console.log "*** LEAVE CHANNEL #{channel}"
+
 			sessions[sessionID].connectionClosed(socket)
 			sessionStore.removeAllListeners "#{sessionID} updated"
 
@@ -115,13 +119,14 @@ module.exports.connection = (sessionStore) ->
 
 				theSession.joinChannel channel, socket
 
-		socket.on 'leave', ({ channel }) ->
+		leave = ({ channel, message }) ->
 			channel = sanitize channel
 			console.log "*** #{session.nick} leaving channel #{channel}, socket #{socket.id}"
 			if channels[channel]?
 				data =
 					nick: session.nick
 					channel: channel
+					message: message
 
 				if theSession.leaveChannel channel, socket
 					channels[channel].leave sessionID
@@ -134,6 +139,8 @@ module.exports.connection = (sessionStore) ->
 				socket.emit 'leave', data
 			else
 				console.log "*** #[socketID} tried to leave non-existing channel #{channel}"
+
+		socket.on 'leave', leave
 
 		socket.emit 'info', { msg: "Welcome to HackChat!" }
 		socket.emit 'info', { msg: "Type /help to get help." }

@@ -81,13 +81,14 @@ join = function(channel) {
   });
 };
 
-leave = function(channel) {
+leave = function(channel, message) {
   if (!channel) {
     return show('*** Please specify channel.');
   } else {
     channel = sanitize(channel);
     return socket.emit('leave', {
-      channel: channel
+      channel: channel,
+      message: message || "leaving"
     });
   }
 };
@@ -131,7 +132,7 @@ help = function(help) {
   show("*** /names [<channel>] - show who's on a channel");
   show("*** /next - next channel (shortcut: Ctrl-X)");
   show("*** /prev - previous channel");
-  show("*** /leave [<channel>] - leave a channel (current channel by default)");
+  show("*** /leave [<channel>] [<message>] - leave a channel (current channel by default)");
   show("*** /help - here we are. Alias: /h");
   show("*** /ping - ping the server.");
   return show("*** /reconnect - try to connect to the server we're not connected.");
@@ -207,7 +208,7 @@ execute = function(cmd) {
     case 'leave':
     case 'le':
     case 'part':
-      return leave((_ref3 = args[0]) != null ? _ref3 : mychannel);
+      return leave((_ref3 = args[0]) != null ? _ref3 : mychannel, args.slice(1).join(' '));
     case 'next':
       return next();
     case 'prev':
@@ -302,9 +303,9 @@ initSocket = function() {
     }
   });
   socket.on('leave', function(_arg) {
-    var channel, nextChannel, nick;
-    nick = _arg.nick, channel = _arg.channel;
-    show("*** " + nick + " has left channel #" + channel + ".");
+    var channel, message, nextChannel, nick;
+    nick = _arg.nick, channel = _arg.channel, message = _arg.message;
+    show("*** " + nick + " has left channel #" + channel + " (" + message + ").");
     if (nick === mynick) {
       nextChannel = removeChannel(channel);
       if (mychannel === channel) {
