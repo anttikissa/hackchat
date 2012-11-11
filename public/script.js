@@ -1,4 +1,4 @@
-var addChannel, channels, connected, down, escapeHtml, execute, help, history, historyIdx, initSocket, isCommand, join, leave, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, sanitize, say, setChannel, show, socket, up,
+var addChannel, channels, connected, down, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, isCommand, join, leave, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, sanitize, say, setChannel, show, socket, up,
   __slice = [].slice,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -158,8 +158,27 @@ say = function(channel, msg) {
   }
 };
 
-show = function(msg) {
-  $('.chat').append("<p>" + (escapeHtml(msg)) + "</p>");
+formatTime = function(date) {
+  var hours, mins;
+  hours = String(date.getHours());
+  mins = String(date.getMinutes());
+  while (hours.length < 2) {
+    hours = '0' + hours;
+  }
+  while (mins.length < 2) {
+    mins = '0' + mins;
+  }
+  return "" + hours + ":" + mins;
+};
+
+show = function(msg, ts) {
+  var date, time;
+  if (ts == null) {
+    ts = new Date().getTime();
+  }
+  date = new Date(ts);
+  time = formatTime(date);
+  $('.chat').append("<p><time datetime='" + (date.toISOString()) + "'>" + time + "</time> " + (escapeHtml(msg)) + "</p>");
   return $('.chat').scrollTop(1000000);
 };
 
@@ -433,6 +452,9 @@ $(function() {
   });
   $('#cmd').blur(function() {
     return $('.input').removeClass('focus');
+  });
+  $('time').live('click', function(ev) {
+    return show("*** That's " + (new Date($(ev.target).attr('datetime'))) + ".");
   });
   initialChannels = (window.location.hash.replace(/^#/, '')).trim().split(',');
   for (_i = 0, _len = initialChannels.length; _i < _len; _i++) {

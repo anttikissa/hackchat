@@ -132,6 +132,10 @@ table {
   line-height: 20px;
   font-weight: 100;
 }
+.linklike {
+  border-bottom: 1px solid #333;
+  cursor: pointer;
+}
 body {
   font-size: 16px;
   font-family: source-code-pro, 'Courier New', Courier, monospace;
@@ -159,6 +163,10 @@ body {
 }
 .chat {
   overflow: auto;
+}
+.chat time:hover {
+  border-bottom: 1px solid #333;
+  cursor: pointer;
 }
 .input {
   border-top: 1px solid #ccc;

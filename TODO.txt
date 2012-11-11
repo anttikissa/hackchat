@@ -3,8 +3,6 @@
 
 /list
 
-Scroll to end when messages come. 
-
 Topics
 
 Private messages.
@@ -19,8 +17,6 @@ Private messages.
 Logs...
 
 /whois
-
-Add timestamps to output
 
 Any unique prefix of a command should work
 

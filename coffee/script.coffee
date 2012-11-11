@@ -126,8 +126,22 @@ say = (channel, msg) ->
 		channel = sanitize channel
 		socket.emit 'say', channel: channel, msg: msg
 
-show = (msg) ->
-	$('.chat').append "<p>#{escapeHtml msg}</p>"
+formatTime = (date) ->
+	hours = String(date.getHours())
+	mins = String(date.getMinutes())
+	while hours.length < 2
+		hours = '0' + hours
+	while mins.length < 2
+		mins = '0' + mins
+	"#{hours}:#{mins}"
+
+show = (msg, ts) ->
+	ts ?= new Date().getTime()
+	date = new Date(ts)
+	time = formatTime(date)
+
+	# probably close enough
+	$('.chat').append "<p><time datetime='#{date.toISOString()}'>#{time}</time> #{escapeHtml msg}</p>"
 	$('.chat').scrollTop 1000000
 
 isCommand = (cmd) ->
@@ -324,6 +338,9 @@ $ ->
 	$('#cmd').blur ->
 		$('.input').removeClass('focus')
 
+	$('time').live 'click', (ev) ->
+		show "*** That's #{new Date($(ev.target).attr('datetime'))}."
+
 	initialChannels = (window.location.hash.replace /^#/, '').trim().split ','
 
 	# TODO handling of these
@@ -342,7 +359,6 @@ $ ->
 	doLayout = () ->
 		magic = 76
 		$('.chat').css('height', windowHeight - magic)
-#		/*windowHeight - magic*/)
 		$('body').css('height', windowHeight)
 
 	doLayout()
