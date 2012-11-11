@@ -43,6 +43,17 @@ newNick = () ->
 	"anon_" + t.toString(26)
 
 app.use (req, resp, next) ->
+	host = req.header('host')
+
+	if host
+		if host.match /^www\./i
+			resp.redirect 301, "http://#{host.replace(/^www\./i, '')}/"
+		else
+			next()
+	else
+		resp.send 'Fail', 404
+
+app.use (req, resp, next) ->
 	if not req.session.nick?
 		nick = newNick()
 		console.log "*** #{req.sessionID} is new user, giving nick #{nick}"
