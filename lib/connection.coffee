@@ -49,7 +49,6 @@ module.exports.connection = (sessionStore) ->
 #		,	20000)
 
 		socket.on 'ping', (data) ->
-			console.log "(#{session.nick} @ #{socket.id}) PING #{JSON.stringify data}"
 			socket.emit 'pong', data
 
 		socket.on 'newNick', ({ newNick }) ->
@@ -87,7 +86,6 @@ module.exports.connection = (sessionStore) ->
 
 			for channel of theSession.channels
 				leave { channel: channel, message: "disconnected" }
-				console.log "*** LEAVE CHANNEL #{channel}"
 
 			sessions[sessionID].connectionClosed(socket)
 			sessionStore.removeAllListeners "#{sessionID} updated"
@@ -110,14 +108,14 @@ module.exports.connection = (sessionStore) ->
 				socket.emit 'info', { msg: "Invalid channel. Must be alphanumeric & at most 25 characters long." }
 			else
 				theChannel = (channels[channel] ?= new Channel(sessionStore, channel))
+				theSession.joinChannel channel, socket
+
 				if theChannel.join sessionID
-					console.log "*** Channel #{channel}: #{theChannel.members.join ' '}"
 					theChannel.emit 'join', { nick: session.nick, channel: channel }
 					names channel
 				else
 					socket.emit 'join', { nick: session.nick, channel: channel }
 
-				theSession.joinChannel channel, socket
 
 		leave = ({ channel, message }) ->
 			channel = sanitize channel

@@ -250,7 +250,7 @@ initSocket = function() {
     var backThen, now;
     backThen = data.ts;
     now = new Date().getTime();
-    return show("PONG " + (JSON.stringify(data)) + ", roundtrip " + (now - backThen) + " ms");
+    return show("*** pong - roundtrip " + (now - backThen) + " ms");
   });
   socket.on('newNick', function(_arg) {
     var info, newNick, oldNick;

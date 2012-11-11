@@ -12,14 +12,12 @@ class Channel
 			false
 		else
 			@members.push sessionID
-			console.log "*** Channel #{@name} adding #{sessionID}"
-			console.log "*** Now have users: #{@members.join ' '}"
+			console.log "*** #{sessionID} joined ##{@name}"
 			true
 	
 	leave: (sessionID) ->
 		@members = _.without @members, sessionID
-		console.log "*** Channel #{@name} removing #{sessionID}"
-		console.log "*** Now have users: #{@members.join ' '}"
+		console.log "*** #{sessionID} joined ##{@name}"
 
 	has: (sessionID) ->
 		sessionID in @members
@@ -34,7 +32,6 @@ class Channel
 				result.push session
 				if result.length == membersLength
 					return cb null, result
-				
 
 	emit: (what, data) ->
 #		console.log "*** Channel ##{@name} emitting #{what}: #{JSON.stringify data}"

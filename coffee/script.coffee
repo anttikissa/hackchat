@@ -180,7 +180,7 @@ initSocket = () ->
 	socket.on 'pong', (data) ->
 		backThen = data.ts
 		now = new Date().getTime()
-		show "PONG #{JSON.stringify data}, roundtrip #{now - backThen} ms"
+		show "*** pong - roundtrip #{now - backThen} ms"
 
 	socket.on 'newNick', ({ oldNick, newNick }) ->
 		info = { newNick: { oldNick: oldNick, newNick: newNick } }

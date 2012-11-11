@@ -18,8 +18,8 @@ class Session
 			@channels[channel].push socket.id unless socket.id in @channels[channel]
 
 #		@channels.push channel unless @channels in channel
-		console.log "*** #{@sessionID} joins channel #{channel} with #{socket.id}."
-		console.log "*** @channels is now #{JSON.stringify @channels}"
+#		console.log "*** #{@sessionID} joins channel #{channel} with #{socket.id}."
+#		console.log "*** @channels is now #{JSON.stringify @channels}"
 
 	# Whether we should send data from channel to the given socket
 	# what belongs to this session.  If it sounds a bit complicated, it is.
@@ -47,13 +47,13 @@ class Session
 		else
 			result = false
 
-		console.log "*** #{@sessionID} leaves channel #{channel} with #{socket.id}"
-		console.log "*** @channels is now #{JSON.stringify @channels}"
+#		console.log "*** #{@sessionID} leaves channel #{channel} with #{socket.id}"
+#		console.log "*** @channels is now #{JSON.stringify @channels}"
 		result
 
 	newConnection: (socket) ->
 		@connections.push socket
-		console.log "*** New connection! Now session #{@sessionID} has #{@connections.length} connections."
+#		console.log "*** New connection! Now session #{@sessionID} has #{@connections.length} connections."
 
 	connectionClosed: (socket) ->
 		@connections = _.reject @connections, (aSocket) ->
