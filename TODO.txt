@@ -3,6 +3,8 @@
 
 Ctrl-X
 
+Show something instead of empty topic.
+
 Nick collisions
 
 Remove pings and greeter
