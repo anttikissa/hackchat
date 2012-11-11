@@ -37,7 +37,7 @@ removeChannel = function(channel) {
 
 setChannel = function(next) {
   mychannel = next;
-  return $('.mychannel').html(next);
+  return $('.mychannel').html(next ? '#' + next : '');
 };
 
 next = function() {
@@ -269,8 +269,7 @@ initSocket = function() {
     nick = _arg.nick, channel = _arg.channel;
     tellUser = true;
     if (nick === mynick) {
-      $('.mychannel').html(channel);
-      mychannel = channel;
+      setChannel(channel);
       if (__indexOf.call(channels, channel) >= 0) {
         tellUser = false;
       } else {
@@ -288,8 +287,7 @@ initSocket = function() {
     if (nick === mynick) {
       nextChannel = removeChannel(channel);
       if (mychannel === channel) {
-        mychannel = nextChannel;
-        return $('.mychannel').html(nextChannel != null ? nextChannel : '');
+        return setChannel(next);
       }
     }
   });

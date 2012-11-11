@@ -33,7 +33,7 @@ removeChannel = (channel) ->
 
 setChannel = (next) ->
 	mychannel = next
-	$('.mychannel').html(next)
+	$('.mychannel').html(if next then '#' + next else '')
 
 next = () ->
 	if channels.length <= 1 || not mychannel
@@ -193,8 +193,7 @@ initSocket = () ->
 	socket.on 'join', ({ nick, channel }) ->
 		tellUser = true
 		if nick == mynick
-			$('.mychannel').html(channel)
-			mychannel = channel
+			setChannel(channel)
 			if channel in channels
 				tellUser = false
 			else
@@ -210,8 +209,7 @@ initSocket = () ->
 		if nick == mynick
 			nextChannel = removeChannel channel
 			if mychannel == channel
-				mychannel = nextChannel
-				$('.mychannel').html(nextChannel ? '')
+				setChannel(next)
 
 	socket.on 'say', ({ nick, channel, msg }) ->
 		show "<#{nick}:##{channel}> #{msg}"

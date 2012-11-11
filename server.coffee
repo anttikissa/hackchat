@@ -9,6 +9,7 @@ cookie = require 'cookie'
 parseSignedCookie = require('connect/lib/utils').parseSignedCookie
 _ = require 'underscore'
 
+packageJson = require './package.json'
 sessions = require './lib/sessions'
 sessionUtil = require './lib/sessionUtil'
 Session = sessionUtil.Session
@@ -64,7 +65,10 @@ app.use (req, resp, next) ->
 	next()
 
 app.get '/', (req, resp) ->
-	resp.render 'index.ejs', { nick: req.session.nick }
+	resp.render 'index.ejs', {
+		nick: req.session.nick
+		version: packageJson.version
+	}
 
 io.set 'authorization', (data, cb) ->
 	cookieHeader = data.headers.cookie
