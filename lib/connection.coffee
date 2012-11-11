@@ -77,6 +77,14 @@ module.exports.connection = (sessionStore) ->
 			else
 				socket.emit 'info', { msg: "You're not on #{channel}. Cannot say." }
 
+		socket.on 'list', ->
+			chans = _.keys channels
+			chans.sort()
+			for chan, idx in chans
+				chans[idx] = "#" + chan
+
+			socket.emit 'info', { msg: "All channels: #{chans.join ' '}" }
+
 		socket.on 'disconnect', ->
 			console.log "*** #{session.nick} @ #{socket.id} disconnected"
 
@@ -138,4 +146,5 @@ module.exports.connection = (sessionStore) ->
 
 		socket.emit 'info', { msg: "Welcome to HackChat!" }
 		socket.emit 'info', { msg: "Type /help to get help." }
+		socket.emit 'info', { msg: "Join #nodeknockout for general chat, #feedback for giving feedback." }
 

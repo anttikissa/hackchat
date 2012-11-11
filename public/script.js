@@ -1,4 +1,4 @@
-var addChannel, channels, connected, down, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, isCommand, join, leave, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, sanitize, say, setChannel, show, socket, up,
+var addChannel, channels, connected, down, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, isCommand, join, leave, list, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, sanitize, say, setChannel, show, socket, up,
   __slice = [].slice,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -112,6 +112,10 @@ names = function(channel) {
   }
 };
 
+list = function() {
+  return socket.emit('list');
+};
+
 reconnect = function() {
   var uri, uuri;
   if (connected) {
@@ -135,6 +139,7 @@ reconnect = function() {
 help = function(help) {
   show("*** Available commands:");
   show("*** /nick <nick> - change nick.");
+  show("*** /list - show channels");
   show("*** /say <message> - say on current channel.");
   show("*** /join <channel> - join a channel. Alias: /j");
   show("*** /names [<channel>] - show who's on a channel");
@@ -263,6 +268,8 @@ execute = function(cmd) {
     case 'names':
     case 'n':
       return names((_ref2 = args[0]) != null ? _ref2 : mychannel);
+    case 'list':
+      return list();
     case 'say':
     case 's':
       return say(mychannel, args);

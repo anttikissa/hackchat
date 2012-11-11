@@ -82,6 +82,9 @@ names = (channel) ->
 		channel = sanitize channel
 		socket.emit 'names', channel: channel
 
+list = ->
+	socket.emit 'list'
+
 reconnect = ->
 	if connected
 		show "*** Disconnecting."
@@ -106,7 +109,7 @@ reconnect = ->
 help = (help) ->
 	show "*** Available commands:"
 	show "*** /nick <nick> - change nick."
-#	show "*** /list - show channels"
+	show "*** /list - show channels"
 	show "*** /say <message> - say on current channel."
 	show "*** /join <channel> - join a channel. Alias: /j"
 	show "*** /names [<channel>] - show who's on a channel"
@@ -198,6 +201,7 @@ execute = (cmd) ->
 		when 'ping' then ping()
 		when 'join', 'j' then join args[0]
 		when 'names', 'n' then names (args[0] ? mychannel)
+		when 'list' then list()
 		when 'say', 's' then say mychannel, args
 		when 'help', 'h' then help args
 		when 'reconnect', 're', 'reco' then reconnect()
