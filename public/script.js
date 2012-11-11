@@ -301,13 +301,40 @@ initSocket = function() {
 };
 
 $(function() {
-  var focus;
+  var clicks, focus, timer;
   mynick = $('.mynick').html();
   initSocket();
   focus = function() {
     return $('#cmd').focus();
   };
   focus();
+  clicks = 0;
+  timer = null;
+  $(window).click(function(e) {
+    console.log("### Click.");
+    clicks++;
+    if (clicks === 1) {
+      return timer = setTimeout(function() {
+        console.log("### Single click.");
+        console.log("### Reset click counter.");
+        clicks = 0;
+        return focus();
+      }, 300);
+    } else {
+      clearTimeout(timer);
+      console.log("### " + clicks + "-click.");
+      return timer = setTimeout(function() {
+        console.log("### Reset click counter.");
+        return clicks = 0;
+      }, 300);
+    }
+  });
+  $(window).keypress(function(e) {
+    console.log(e);
+    if (e.target.id !== 'cmd') {
+      return $('#cmd').focus();
+    }
+  });
   return $('#cmd').keypress(function(event) {
     var cmd;
     if (event.keyCode === 13) {

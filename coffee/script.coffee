@@ -226,6 +226,28 @@ $ ->
 	focus()
 #	setInterval(focus, 300)
 
+	clicks = 0
+	timer = null
+
+	$(window).click (e) ->
+		console.log "### Click."
+		clicks++
+		if clicks == 1
+			timer = setTimeout(->
+				clicks = 0
+				focus()
+			,	300)
+		else
+			clearTimeout timer
+			timer = setTimeout(->
+				clicks = 0
+			,	300)
+
+	$(window).keypress (e) ->
+		console.log e
+		if (e.target.id != 'cmd')
+			$('#cmd').focus()
+
 	$('#cmd').keypress (event) ->
 		if event.keyCode == 13
 			cmd = $(event.target).val()
