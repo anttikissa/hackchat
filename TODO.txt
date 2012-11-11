@@ -3,11 +3,9 @@
 
 Ctrl-X
 
-Don't be so jumpy, title bar.
-
 Make scrolling work.
 
-Mouse click anywhere to focus the command line.
+Private messages.
 
 /join foo - you're already on that channel!
     Should just add channel to the current connection/socket.
