@@ -4,7 +4,7 @@
     "hackchat.net",
     "www.hackchat.net"
   ],
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Hack hack hack",
   "main": "server.coffee",
   "scripts": {

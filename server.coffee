@@ -11,7 +11,7 @@ _ = require 'underscore'
 
 # packageJson = require './package.json'
 # would be nice but doesn't work on custom domain
-packageJson = { version: '0.0.2' }
+packageJson = { version: '0.0.3' }
 
 sessions = require './lib/sessions'
 sessionUtil = require './lib/sessionUtil'
