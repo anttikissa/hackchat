@@ -3,6 +3,8 @@
 
 Make sure that the list of channels stays up-to-date.
 
+Command history.
+
 /list
 
 Topics

@@ -18,6 +18,7 @@ mychannel = null
 
 addChannel = (channel) ->
 	channels.push channel
+	location.hash = channels.join ','
 	$('.ifchannel').show()
 
 # Remove channel from list, return channel next to it
@@ -25,6 +26,7 @@ removeChannel = (channel) ->
 	idx = channels.indexOf channel
 	if idx != -1
 		channels.splice idx, 1
+	location.hash = channels.join ','
 	if channels.length == 0
 		$('.ifchannel').hide()
 		return null
@@ -170,7 +172,7 @@ initSocket = () ->
 	socket.on 'connect', ->
 		show "*** Connected to server."
 		connected = true
-		ping()
+#		ping()
 		for channel in channels
 			join channel
 

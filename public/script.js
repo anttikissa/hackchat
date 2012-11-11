@@ -18,6 +18,7 @@ mychannel = null;
 
 addChannel = function(channel) {
   channels.push(channel);
+  location.hash = channels.join(',');
   return $('.ifchannel').show();
 };
 
@@ -27,6 +28,7 @@ removeChannel = function(channel) {
   if (idx !== -1) {
     channels.splice(idx, 1);
   }
+  location.hash = channels.join(',');
   if (channels.length === 0) {
     $('.ifchannel').hide();
     return null;
@@ -238,7 +240,6 @@ initSocket = function() {
     var channel, _i, _len, _results;
     show("*** Connected to server.");
     connected = true;
-    ping();
     _results = [];
     for (_i = 0, _len = channels.length; _i < _len; _i++) {
       channel = channels[_i];
