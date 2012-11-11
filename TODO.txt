@@ -1,12 +1,6 @@
 
 # Items to do
 
-http://.../#foo doesn't work on a fresh server
- 
-Nick collisions
-
-Remove pings and greeter
-
 Make scrolling work.
 
 Private messages.
@@ -20,6 +14,8 @@ Private messages.
 
 Topics
 
+Logs...
+
 The big channel-connection association thing - what does it mean to be on a
 channel?
 
@@ -29,10 +25,11 @@ Add timestamps to output
 
 Any unique prefix of a command should work
 
-
+Nick collisions
+    Actually, not at all important!
 
 # To do... later
 
 Why is reconnect broken?
-    - fixed with a inglorious socket.io hack - get back to this later
+    Fixed with a inglorious socket.io hack - get back to this later.
 
