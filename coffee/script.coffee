@@ -152,9 +152,16 @@ execute = (cmd) ->
 		else show "*** I don't know that command: #{command}."
 
 initSocket = () ->
-	# Some commands may be sent multiple times (for every channel you are on).
-	# Ignore them.
-	previousCommand = null
+	# Some infos may be sent multiple times (for every channel you are on).
+	# Ignore them. Should be done on the server side.
+	previousInfo = null
+	wasDuplicate = (info) ->
+		if JSON.stringify(previousInfo) == JSON.stringify(info)
+			console.log "### Ignoring duplicate info #{JSON.stringify info}"
+			true
+		else
+			previousInfo = info
+			false
 
 	socket.on 'disconnect', ->
 		show "*** Disconnected from server."
@@ -176,6 +183,10 @@ initSocket = () ->
 		show "PONG #{JSON.stringify data}, roundtrip #{now - backThen} ms"
 
 	socket.on 'newNick', ({ oldNick, newNick }) ->
+		info = { newNick: { oldNick: oldNick, newNick: newNick } }
+		if wasDuplicate(info)
+			return
+		
 		console.log "### NEWNICK #{oldNick} #{newNick}"
 		if oldNick == mynick
 			show "*** You are now known as #{newNick}."

@@ -218,8 +218,17 @@ execute = function(cmd) {
 };
 
 initSocket = function() {
-  var previousCommand;
-  previousCommand = null;
+  var previousInfo, wasDuplicate;
+  previousInfo = null;
+  wasDuplicate = function(info) {
+    if (JSON.stringify(previousInfo) === JSON.stringify(info)) {
+      console.log("### Ignoring duplicate info " + (JSON.stringify(info)));
+      return true;
+    } else {
+      previousInfo = info;
+      return false;
+    }
+  };
   socket.on('disconnect', function() {
     show("*** Disconnected from server.");
     return connected = false;
@@ -243,8 +252,17 @@ initSocket = function() {
     return show("PONG " + (JSON.stringify(data)) + ", roundtrip " + (now - backThen) + " ms");
   });
   socket.on('newNick', function(_arg) {
-    var newNick, oldNick;
+    var info, newNick, oldNick;
     oldNick = _arg.oldNick, newNick = _arg.newNick;
+    info = {
+      newNick: {
+        oldNick: oldNick,
+        newNick: newNick
+      }
+    };
+    if (wasDuplicate(info)) {
+      return;
+    }
     console.log("### NEWNICK " + oldNick + " " + newNick);
     if (oldNick === mynick) {
       show("*** You are now known as " + newNick + ".");
