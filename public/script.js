@@ -329,7 +329,7 @@ initSocket = function() {
 };
 
 $(function() {
-  var c, clicks, focus, initialChannels, timer, _i, _len, _results;
+  var c, clicks, doLayout, focus, initialChannels, timer, windowHeight, _i, _len;
   mynick = $('.mynick').html();
   initSocket();
   focus = function() {
@@ -369,15 +369,26 @@ $(function() {
     }
   });
   initialChannels = (window.location.hash.replace(/^#/, '')).trim().split(',');
-  console.log("initials " + (JSON.stringify(initialChannels)));
-  _results = [];
   for (_i = 0, _len = initialChannels.length; _i < _len; _i++) {
     c = initialChannels[_i];
     if (c) {
-      _results.push(join(c));
-    } else {
-      _results.push(void 0);
+      join(c);
     }
   }
-  return _results;
+  windowHeight = $(window).height();
+  $(window).resize(function() {
+    var newHeight;
+    newHeight = $(window).height();
+    if (newHeight !== windowHeight) {
+      windowHeight = newHeight;
+      return doLayout();
+    }
+  });
+  doLayout = function() {
+    var magic;
+    magic = 76;
+    $('.chat').css('height', windowHeight - magic);
+    return $('body').css('height', windowHeight);
+  };
+  return doLayout();
 });

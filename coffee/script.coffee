@@ -274,8 +274,24 @@ $ ->
 
 	initialChannels = (window.location.hash.replace /^#/, '').trim().split ','
 
-	console.log "initials #{JSON.stringify initialChannels}"
+	# TODO handling of these
+#	console.log "initials #{JSON.stringify initialChannels}"
 	for c in initialChannels
-		if c
-			join c
+		join c if c
+
+	windowHeight = $(window).height()
+
+	$(window).resize ->
+		newHeight = $(window).height()
+		if newHeight != windowHeight
+			windowHeight = newHeight
+			doLayout()
+
+	doLayout = () ->
+		magic = 76
+		$('.chat').css('height', windowHeight - magic)
+#		/*windowHeight - magic*/)
+		$('body').css('height', windowHeight)
+
+	doLayout()
 

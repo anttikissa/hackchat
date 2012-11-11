@@ -1,8 +1,6 @@
 
 # Items to do
 
-Rejoin channels after reconnecting.
-
 Make sure that the list of channels stays up-to-date.
 
 Make scrolling work.
