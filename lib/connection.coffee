@@ -122,6 +122,5 @@ module.exports.connection = (sessionStore) ->
 				console.log "*** #[socketID} tried to leave non-existing channel #{channel}"
 
 		socket.emit 'info', { msg: "Welcome to HackChat!" }
-
-#			if channels[channel]?
+		socket.emit 'info', { msg: "Type /help to get help." }
 
