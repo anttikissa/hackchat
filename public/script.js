@@ -287,7 +287,7 @@ initSocket = function() {
     if (nick === mynick) {
       nextChannel = removeChannel(channel);
       if (mychannel === channel) {
-        return setChannel(next);
+        return setChannel(nextChannel);
       }
     }
   });

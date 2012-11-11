@@ -107,8 +107,7 @@ module.exports.connection = (sessionStore) ->
 					names channel
 					theSession.joinChannel channel, socket
 				else
-#					socket.emit 'info', { msg: "You're already on that channel!" }
-					theChannel.emit 'join', { nick: session.nick, channel: channel }
+					socket.emit 'join', { nick: session.nick, channel: channel }
 
 		socket.on 'leave', ({ channel }) ->
 			channel = sanitize channel

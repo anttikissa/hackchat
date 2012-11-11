@@ -209,7 +209,7 @@ initSocket = () ->
 		if nick == mynick
 			nextChannel = removeChannel channel
 			if mychannel == channel
-				setChannel(next)
+				setChannel(nextChannel)
 
 	socket.on 'say', ({ nick, channel, msg }) ->
 		show "<#{nick}:##{channel}> #{msg}"
