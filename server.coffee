@@ -9,7 +9,10 @@ cookie = require 'cookie'
 parseSignedCookie = require('connect/lib/utils').parseSignedCookie
 _ = require 'underscore'
 
-packageJson = require './package.json'
+# packageJson = require './package.json'
+# would be nice but doesn't work on custom domain
+packageJson = { version: '0.0.1' }
+
 sessions = require './lib/sessions'
 sessionUtil = require './lib/sessionUtil'
 Session = sessionUtil.Session
