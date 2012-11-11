@@ -34,7 +34,7 @@ class Channel
 					return cb null, result
 
 	emit: (what, data) ->
-		console.log "*** Channel ##{@name} emitting #{what}: #{JSON.stringify data}"
+#		console.log "*** Channel ##{@name} emitting #{what}: #{JSON.stringify data}"
 		for sessionID in @members
 			theSession = sessions[sessionID]
 			for socket in theSession.connections
