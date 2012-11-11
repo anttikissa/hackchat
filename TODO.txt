@@ -3,7 +3,9 @@
 
 Make sure that the list of channels stays up-to-date.
 
-Make scrolling work.
+/list
+
+Topics
 
 Private messages.
 
@@ -14,14 +16,7 @@ Private messages.
 
     And it shouldn't be the default.
 
-/list
-
-Topics
-
 Logs...
-
-The big channel-connection association thing - what does it mean to be on a
-channel?
 
 /whois
 
