@@ -135,7 +135,7 @@ help = function(help) {
   show("*** /leave [<channel>] [<message>] - leave a channel (current channel by default)");
   show("*** /help - here we are. Alias: /h");
   show("*** /ping - ping the server.");
-  return show("*** /reconnect - try to connect to the server we're not connected.");
+  return show("*** /reconnect - try to connect to the server if we're not connected.");
 };
 
 say = function(channel, msg) {
@@ -235,9 +235,16 @@ initSocket = function() {
     return connected = false;
   });
   socket.on('connect', function() {
+    var channel, _i, _len, _results;
     show("*** Connected to server.");
     connected = true;
-    return ping();
+    ping();
+    _results = [];
+    for (_i = 0, _len = channels.length; _i < _len; _i++) {
+      channel = channels[_i];
+      _results.push(join(channel));
+    }
+    return _results;
   });
   socket.on('names', function(_arg) {
     var channel, names;

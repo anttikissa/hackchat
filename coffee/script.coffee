@@ -171,6 +171,8 @@ initSocket = () ->
 		show "*** Connected to server."
 		connected = true
 		ping()
+		for channel in channels
+			join channel
 
 	socket.on 'names', ({ channel, names }) ->
 		names.sort()

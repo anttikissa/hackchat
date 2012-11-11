@@ -1,9 +1,15 @@
 
 # Items to do
 
+Rejoin channels after reconnecting.
+
+Make sure that the list of channels stays up-to-date.
+
 Make scrolling work.
 
 Private messages.
+
+"1 people on #foo"
 
 /join foo - you're already on that channel!
     Should just add channel to the current connection/socket.
