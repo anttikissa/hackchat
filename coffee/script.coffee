@@ -3,6 +3,9 @@
 connected = false
 socket = io.connect()
 
+# List of all channels this socket is on.
+channels = []
+
 escapeHtml = (s) ->
 	s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 	.replace(/"/g, "&quot;") .replace(/'/g, "&#039;")
@@ -20,6 +23,15 @@ newNick = (newNick) ->
 join = (channel) ->
 	channel = sanitize channel
 	socket.emit 'join', channel: channel
+
+leave = (channel) ->
+	channel ?= mychannel
+	
+	if not channel
+		show '*** Please specify channel.'
+	else
+		channel = sanitize channel
+		socket.emit 'leave', channel: channel
 
 names = (channel) ->
 	channel ?= mychannel
@@ -59,7 +71,7 @@ help = (help) ->
 	show "*** /join <channel> - join a channel. Alias: /j"
 	show "*** /names [<channel>] - show who's on a channel"
 #	show "*** /whois [<nick>] - show info about a person"
-#	show "*** /leave [<channel>] - leave a channel (current channel by default)"
+	show "*** /leave [<channel>] - leave a channel (current channel by default)"
 #	show "*** /msg <nick> <message> - send private message to <nick>"
 	show "*** /help - here we are. Alias: /h"
 	show "*** /ping - ping the server."
@@ -99,7 +111,7 @@ execute = (cmd) ->
 		when 'say', 's' then say mychannel, args
 		when 'help', 'h' then help args
 		when 'reconnect', 're', 'reco' then reconnect()
-#		when 'leave', 'le', 'part' then leave()
+		when 'leave', 'le', 'part' then leave()
 		else show "*** I don't know that command: #{command}."
 
 mynick = null
@@ -145,11 +157,26 @@ initSocket = () ->
 		show "<#{from}> #{msg}"
 
 	socket.on 'join', ({ nick, channel }) ->
-		show "*** #{nick} has joined channel ##{channel}."
-		# TODO This is not a tenable solution.
+		tellUser = true
 		if nick == mynick
-			$('mychannel').val(channel)
+			$('.mychannel').html(channel)
 			mychannel = channel
+			if channel in channels
+				tellUser = false
+			else
+				channels.push channel
+				show "*** channels this socket is on: #{channels.join ' '}"
+
+		if tellUser
+			show "*** #{nick} has joined channel ##{channel}."
+
+	socket.on 'leave', ({ nick, channel }) ->
+		show "*** #{nick} has left channel ##{channel}."
+
+		# TODO figure out other channel
+		if nick == mynick
+			$('.mychannel').html('')
+			mychannel = null
 
 	socket.on 'say', ({ nick, channel, msg }) ->
 		show "<#{nick} ##{channel}> #{msg}"

@@ -1,4 +1,5 @@
 sessions = require './sessions'
+_ = require 'underscore'
 
 # ...
 class Channel
@@ -11,7 +12,14 @@ class Channel
 			false
 		else
 			@members.push sessionID
+			console.log "*** Channel #{@name} adding #{sessionID} from books"
+			console.log "*** Now have #{@members.length} members"
 			true
+	
+	leave: (sessionID) ->
+		@members = _.without @members, sessionID
+		console.log "*** Channel #{@name} removing #{sessionID} from books"
+		console.log "*** Now have #{@members.length} members"
 
 	has: (sessionID) ->
 		sessionID in @members

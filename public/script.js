@@ -1,9 +1,12 @@
-var connected, escapeHtml, execute, help, initSocket, isCommand, join, mychannel, mynick, names, newNick, parseCommand, ping, reconnect, sanitize, say, show, socket,
-  __slice = [].slice;
+var channels, connected, escapeHtml, execute, help, initSocket, isCommand, join, leave, mychannel, mynick, names, newNick, parseCommand, ping, reconnect, sanitize, say, show, socket,
+  __slice = [].slice,
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 connected = false;
 
 socket = io.connect();
+
+channels = [];
 
 escapeHtml = function(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -30,6 +33,20 @@ join = function(channel) {
   return socket.emit('join', {
     channel: channel
   });
+};
+
+leave = function(channel) {
+  if (channel == null) {
+    channel = mychannel;
+  }
+  if (!channel) {
+    return show('*** Please specify channel.');
+  } else {
+    channel = sanitize(channel);
+    return socket.emit('leave', {
+      channel: channel
+    });
+  }
 };
 
 names = function(channel) {
@@ -72,6 +89,7 @@ help = function(help) {
   show("*** /say <message> - say on current channel.");
   show("*** /join <channel> - join a channel. Alias: /j");
   show("*** /names [<channel>] - show who's on a channel");
+  show("*** /leave [<channel>] - leave a channel (current channel by default)");
   show("*** /help - here we are. Alias: /h");
   show("*** /ping - ping the server.");
   return show("*** /reconnect - try to connect to the server we're not connected.");
@@ -144,6 +162,10 @@ execute = function(cmd) {
     case 're':
     case 'reco':
       return reconnect();
+    case 'leave':
+    case 'le':
+    case 'part':
+      return leave();
     default:
       return show("*** I don't know that command: " + command + ".");
   }
@@ -201,12 +223,30 @@ initSocket = function() {
     return show("<" + from + "> " + msg);
   });
   socket.on('join', function(_arg) {
+    var channel, nick, tellUser;
+    nick = _arg.nick, channel = _arg.channel;
+    tellUser = true;
+    if (nick === mynick) {
+      $('.mychannel').html(channel);
+      mychannel = channel;
+      if (__indexOf.call(channels, channel) >= 0) {
+        tellUser = false;
+      } else {
+        channels.push(channel);
+        show("*** channels this socket is on: " + (channels.join(' ')));
+      }
+    }
+    if (tellUser) {
+      return show("*** " + nick + " has joined channel #" + channel + ".");
+    }
+  });
+  socket.on('leave', function(_arg) {
     var channel, nick;
     nick = _arg.nick, channel = _arg.channel;
-    show("*** " + nick + " has joined channel #" + channel + ".");
+    show("*** " + nick + " has left channel #" + channel + ".");
     if (nick === mynick) {
-      $('mychannel').val(channel);
-      return mychannel = channel;
+      $('.mychannel').html('');
+      return mychannel = null;
     }
   });
   return socket.on('say', function(_arg) {

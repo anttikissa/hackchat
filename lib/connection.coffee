@@ -8,6 +8,10 @@ Session = require('./sessionUtil').Session
 
 Channel = channelUtil.Channel
 
+# Remove any number of #'s from the beginning of the channel name.
+sanitize = (channel) ->
+	channel.replace /^#+/, ''
+
 # Handles a connection with a single socket.io client (i.e. a browser window).
 
 module.exports.connection = (sessionStore) ->
@@ -16,6 +20,7 @@ module.exports.connection = (sessionStore) ->
 		session = socket.handshake.session
 
 		sessions[sessionID] ?= new Session(sessionID)
+		theSession = sessions[sessionID]
 		sessions[sessionID].newConnection(socket)
 
 		console.log "*** #{session.nick} @ #{socket.id} connected"
@@ -88,22 +93,33 @@ module.exports.connection = (sessionStore) ->
 			names channel
 
 		socket.on 'join', ({ channel }) ->
-			channel = channel.replace /^#+/, ''
+			channel = sanitize channel
 
 			if not channelUtil.validChannelName(channel)
 				console.log "*** Invalid channel name ##{channel}"
 				socket.emit 'info', { msg: "Invalid channel. Must be alphanumeric & at most 25 characters long." }
 			else
 				theChannel = (channels[channel] ?= new Channel(sessionStore, channel))
-				
 				if theChannel.join sessionID
 					# TODO if we already were there?
 					# better to push this logic into Channel?
 					console.log "*** Channel #{channel}: #{theChannel.members.join ' '}"
 					theChannel.emit 'join', { nick: session.nick, channel: channel }
 					names channel
+					theSession.joinChannel channel, socket
 				else
-					socket.emit 'info', { msg: "You're already on that channel!" }
+#					socket.emit 'info', { msg: "You're already on that channel!" }
+					theChannel.emit 'join', { nick: session.nick, channel: channel }
+
+		socket.on 'leave', ({ channel }) ->
+			channel = sanitize channel
+			console.log "*** #{session.nick} leaving channel #{channel}, socket #{socket.id}"
+			if channels[channel]?
+				channels[channel].leave sessionID
+				theSession.leaveChannel channel, socket
+				socket.emit 'leave', { nick: session.nick, channel: channel }
+			else
+				console.log "*** #[socketID} tried to leave non-existing channel #{channel}"
 
 		socket.emit 'info', { msg: "Welcome to HackChat!" }
 

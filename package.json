@@ -1,10 +1,10 @@
 {
   "name": "nko3-hack-hack-hack",
   "domains": [
-  	"hackchat.net",
-	"www.hackchat.net"
+    "hackchat.net",
+    "www.hackchat.net"
   ],
-  "version": "0.0.0-8",
+  "version": "0.0.0-9",
   "description": "Hack hack hack",
   "main": "server.coffee",
   "scripts": {
