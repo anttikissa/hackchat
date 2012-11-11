@@ -1,10 +1,20 @@
 # Utilities
 
+# Remove any number of #'s from the beginning of the channel name.
+sanitize = (channel) ->
+	channel.replace /^#+/, ''
+
 connected = false
 socket = io.connect()
 
+# Channel management
+
 # List of all channels this socket is on.
 channels = []
+
+# Mirror the html elements of respective classes.
+mynick = null
+mychannel = null
 
 addChannel = (channel) ->
 	channels.push channel
@@ -21,13 +31,25 @@ removeChannel = (channel) ->
 	else
 		return channels[(idx - 1 + channels.length) % channels.length]
 
+setChannel = (next) ->
+	mychannel = next
+	$('.mychannel').html(next)
+
+next = () ->
+	if channels.length <= 1 || not mychannel
+		return
+	newChannel = channels[(channels.indexOf(mychannel) + 1) % channels.length]
+	setChannel(newChannel)
+
+prev = () ->
+	if channels.length <= 1 || not mychannel
+		return
+	newChannel = channels[(channels.indexOf(mychannel) - 1 + channels.length) % channels.length]
+	setChannel(newChannel)
+
 escapeHtml = (s) ->
 	s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 	.replace(/"/g, "&quot;") .replace(/'/g, "&#039;")
-
-# Remove any number of #'s from the beginning of the channel name.
-sanitize = (channel) ->
-	channel.replace /^#+/, ''
 
 ping = ->
 	socket.emit 'ping', ts: new Date().getTime()
@@ -81,6 +103,8 @@ help = (help) ->
 	show "*** /say <message> - say on current channel."
 	show "*** /join <channel> - join a channel. Alias: /j"
 	show "*** /names [<channel>] - show who's on a channel"
+	show "*** /next - next channel (shortcut: Ctrl-X)"
+	show "*** /prev - previous channel"
 #	show "*** /whois [<nick>] - show info about a person"
 	show "*** /leave [<channel>] - leave a channel (current channel by default)"
 #	show "*** /msg <nick> <message> - send private message to <nick>"
@@ -123,10 +147,9 @@ execute = (cmd) ->
 		when 'help', 'h' then help args
 		when 'reconnect', 're', 'reco' then reconnect()
 		when 'leave', 'le', 'part' then leave args[0] ? mychannel
+		when 'next' then next()
+		when 'prev' then prev()
 		else show "*** I don't know that command: #{command}."
-
-mynick = null
-mychannel = null
 
 initSocket = () ->
 	socket.on 'disconnect', ->

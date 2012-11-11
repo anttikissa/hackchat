@@ -1,12 +1,20 @@
-var addChannel, channels, connected, escapeHtml, execute, help, initSocket, isCommand, join, leave, mychannel, mynick, names, newNick, parseCommand, ping, reconnect, removeChannel, sanitize, say, show, socket,
+var addChannel, channels, connected, escapeHtml, execute, help, initSocket, isCommand, join, leave, mychannel, mynick, names, newNick, next, parseCommand, ping, prev, reconnect, removeChannel, sanitize, say, setChannel, show, socket,
   __slice = [].slice,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+sanitize = function(channel) {
+  return channel.replace(/^#+/, '');
+};
 
 connected = false;
 
 socket = io.connect();
 
 channels = [];
+
+mynick = null;
+
+mychannel = null;
 
 addChannel = function(channel) {
   channels.push(channel);
@@ -27,12 +35,31 @@ removeChannel = function(channel) {
   }
 };
 
-escapeHtml = function(s) {
-  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+setChannel = function(next) {
+  mychannel = next;
+  return $('.mychannel').html(next);
 };
 
-sanitize = function(channel) {
-  return channel.replace(/^#+/, '');
+next = function() {
+  var newChannel;
+  if (channels.length <= 1 || !mychannel) {
+    return;
+  }
+  newChannel = channels[(channels.indexOf(mychannel) + 1) % channels.length];
+  return setChannel(newChannel);
+};
+
+prev = function() {
+  var newChannel;
+  if (channels.length <= 1 || !mychannel) {
+    return;
+  }
+  newChannel = channels[(channels.indexOf(mychannel) - 1 + channels.length) % channels.length];
+  return setChannel(newChannel);
+};
+
+escapeHtml = function(s) {
+  return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 };
 
 ping = function() {
@@ -102,6 +129,8 @@ help = function(help) {
   show("*** /say <message> - say on current channel.");
   show("*** /join <channel> - join a channel. Alias: /j");
   show("*** /names [<channel>] - show who's on a channel");
+  show("*** /next - next channel (shortcut: Ctrl-X)");
+  show("*** /prev - previous channel");
   show("*** /leave [<channel>] - leave a channel (current channel by default)");
   show("*** /help - here we are. Alias: /h");
   show("*** /ping - ping the server.");
@@ -179,14 +208,16 @@ execute = function(cmd) {
     case 'le':
     case 'part':
       return leave((_ref3 = args[0]) != null ? _ref3 : mychannel);
+    case 'next':
+    case 'n':
+      return next();
+    case 'prev':
+    case 'n':
+      return prev();
     default:
       return show("*** I don't know that command: " + command + ".");
   }
 };
-
-mynick = null;
-
-mychannel = null;
 
 initSocket = function() {
   socket.on('disconnect', function() {
