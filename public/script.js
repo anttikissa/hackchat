@@ -1,4 +1,4 @@
-var addChannel, channels, connected, escapeHtml, execute, help, initSocket, isCommand, join, leave, mychannel, mynick, names, newNick, next, parseCommand, ping, prev, reconnect, removeChannel, sanitize, say, setChannel, show, socket,
+var addChannel, channels, connected, down, escapeHtml, execute, help, history, historyIdx, initSocket, isCommand, join, leave, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, sanitize, say, setChannel, show, socket, up,
   __slice = [].slice,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -11,6 +11,12 @@ connected = false;
 socket = io.connect();
 
 channels = [];
+
+history = [];
+
+historyIdx = 0;
+
+newestCommand = '';
 
 mynick = null;
 
@@ -176,8 +182,46 @@ parseCommand = function(cmd) {
   }
 };
 
+up = function() {
+  var command;
+  command = $('#cmd').val();
+  if (historyIdx === history.length) {
+    newestCommand = command;
+  }
+  if (--historyIdx < 0) {
+    historyIdx = 0;
+  }
+  if (historyIdx === history.length) {
+    $('#cmd').val(newestCommand);
+  } else {
+    $('#cmd').val(history[historyIdx]);
+  }
+  return $('#cmd')[0].setSelectionRange(1000, 1000);
+};
+
+down = function() {
+  var command;
+  command = $('#cmd').val();
+  if (historyIdx === history.length) {
+    newestCommand = command;
+  }
+  if (++historyIdx > history.length) {
+    historyIdx = history.length;
+  }
+  if (historyIdx === history.length) {
+    $('#cmd').val(newestCommand);
+  } else {
+    $('#cmd').val(history[historyIdx]);
+  }
+  return $('#cmd')[0].setSelectionRange(1000, 1000);
+};
+
 execute = function(cmd) {
   var args, command, _ref, _ref1, _ref2, _ref3;
+  history.push(cmd);
+  historyIdx = history.length;
+  newestCommand = '';
+  console.log("history: " + (JSON.stringify(history)));
   if (isCommand(cmd)) {
     _ref = parseCommand(cmd), command = _ref.command, args = _ref.args;
   } else {
@@ -361,12 +405,21 @@ $(function() {
       return next();
     }
   });
-  $('#cmd').keypress(function(event) {
+  $('#cmd').keydown(function(event) {
     var cmd;
+    console.log(event);
     if (event.keyCode === 13) {
       cmd = $(event.target).val();
       execute(cmd);
-      return $(event.target).val('');
+      $(event.target).val('');
+    }
+    if (event.keyCode === 38) {
+      up();
+      event.preventDefault();
+    }
+    if (event.keyCode === 40) {
+      down();
+      return event.preventDefault();
     }
   });
   $('#cmd').focus(function() {

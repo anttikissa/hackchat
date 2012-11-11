@@ -12,6 +12,11 @@ socket = io.connect()
 # List of all channels this socket is on.
 channels = []
 
+# Command history.
+history = []
+historyIdx = 0
+newestCommand = ''
+
 # Mirror the html elements of respective classes.
 mynick = null
 mychannel = null
@@ -134,7 +139,37 @@ parseCommand = (cmd) ->
 	else
 		{ command: command.replace(/^\//, ''), args: args }
 
+up = ->
+	command = $('#cmd').val()
+	if historyIdx == history.length
+		newestCommand = command
+	if --historyIdx < 0
+		historyIdx = 0
+	if historyIdx == history.length
+		$('#cmd').val(newestCommand)
+	else
+		$('#cmd').val(history[historyIdx])
+	$('#cmd')[0].setSelectionRange(1000, 1000)
+
+down = ->
+	command = $('#cmd').val()
+	if historyIdx == history.length
+		newestCommand = command
+	if ++historyIdx > history.length
+		historyIdx = history.length
+	if historyIdx == history.length
+		$('#cmd').val(newestCommand)
+	else
+		$('#cmd').val(history[historyIdx])
+	$('#cmd')[0].setSelectionRange(1000, 1000)
+
 execute = (cmd) ->
+	history.push cmd
+	historyIdx = history.length
+	newestCommand = ''
+
+	console.log "history: #{JSON.stringify history}"
+
 	if isCommand cmd
 		{ command, args } = parseCommand cmd
 	else
@@ -267,11 +302,18 @@ $ ->
 		if e.ctrlKey && e.keyCode == 24
 			next()
 
-	$('#cmd').keypress (event) ->
+	$('#cmd').keydown (event) ->
+		console.log event
 		if event.keyCode == 13
 			cmd = $(event.target).val()
 			execute(cmd)
 			$(event.target).val('')
+		if event.keyCode == 38
+			up()
+			event.preventDefault()
+		if event.keyCode == 40
+			down()
+			event.preventDefault()
 
 	$('#cmd').focus ->
 		$('.input').addClass('focus')

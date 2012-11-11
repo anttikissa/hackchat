@@ -1,11 +1,9 @@
 
 # Items to do
 
-Make sure that the list of channels stays up-to-date.
-
-Command history.
-
 /list
+
+Scroll to end when messages come. 
 
 Topics
 
