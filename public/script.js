@@ -296,7 +296,7 @@ initSocket = function() {
   return socket.on('say', function(_arg) {
     var channel, msg, nick;
     nick = _arg.nick, channel = _arg.channel, msg = _arg.msg;
-    return show("<" + nick + " #" + channel + "> " + msg);
+    return show("<" + nick + ":#" + channel + "> " + msg);
   });
 };
 
@@ -315,16 +315,12 @@ $(function() {
     clicks++;
     if (clicks === 1) {
       return timer = setTimeout(function() {
-        console.log("### Single click.");
-        console.log("### Reset click counter.");
         clicks = 0;
         return focus();
       }, 300);
     } else {
       clearTimeout(timer);
-      console.log("### " + clicks + "-click.");
       return timer = setTimeout(function() {
-        console.log("### Reset click counter.");
         return clicks = 0;
       }, 300);
     }

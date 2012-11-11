@@ -214,7 +214,7 @@ initSocket = () ->
 				$('.mychannel').html(nextChannel ? '')
 
 	socket.on 'say', ({ nick, channel, msg }) ->
-		show "<#{nick} ##{channel}> #{msg}"
+		show "<#{nick}:##{channel}> #{msg}"
 
 $ ->
 	mynick = $('.mynick').html()
