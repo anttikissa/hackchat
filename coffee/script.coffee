@@ -253,3 +253,6 @@ $ ->
 			execute(cmd)
 			$(event.target).val('')
 
+	initialChannels = window.location.hash
+	console.log "initials #{initialChannels}"
+

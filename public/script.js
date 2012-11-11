@@ -299,7 +299,7 @@ initSocket = function() {
 };
 
 $(function() {
-  var clicks, focus, timer;
+  var clicks, focus, initialChannels, timer;
   mynick = $('.mynick').html();
   initSocket();
   focus = function() {
@@ -331,7 +331,7 @@ $(function() {
       return next();
     }
   });
-  return $('#cmd').keypress(function(event) {
+  $('#cmd').keypress(function(event) {
     var cmd;
     if (event.keyCode === 13) {
       cmd = $(event.target).val();
@@ -339,4 +339,6 @@ $(function() {
       return $(event.target).val('');
     }
   });
+  initialChannels = window.location.hash;
+  return console.log("initials " + initialChannels);
 });
