@@ -159,7 +159,8 @@ say = function(channel, msg) {
 };
 
 show = function(msg) {
-  return $('.chat').append("<p>" + (escapeHtml(msg)) + "</p>");
+  $('.chat').append("<p>" + (escapeHtml(msg)) + "</p>");
+  return $('.chat').scrollTop(10000);
 };
 
 isCommand = function(cmd) {
@@ -224,7 +225,6 @@ execute = function(cmd) {
   history.push(cmd);
   historyIdx = history.length;
   newestCommand = '';
-  console.log("history: " + (JSON.stringify(history)));
   if (isCommand(cmd)) {
     _ref = parseCommand(cmd), command = _ref.command, args = _ref.args;
   } else {
@@ -272,7 +272,6 @@ initSocket = function() {
   previousInfo = null;
   wasDuplicate = function(info) {
     if (JSON.stringify(previousInfo) === JSON.stringify(info)) {
-      console.log("### Ignoring duplicate info " + (JSON.stringify(info)));
       return true;
     } else {
       previousInfo = info;
@@ -310,7 +309,6 @@ initSocket = function() {
   socket.on('newNick', function(_arg) {
     var info, newNick, oldNick;
     oldNick = _arg.oldNick, newNick = _arg.newNick;
-    console.log("newNick " + oldNick + " " + newNick);
     info = {
       newNick: {
         oldNick: oldNick,
@@ -320,7 +318,6 @@ initSocket = function() {
     if (wasDuplicate(info)) {
       return;
     }
-    console.log("### NEWNICK " + oldNick + " " + newNick);
     if (oldNick === mynick) {
       show("*** You are now known as " + newNick + ".");
       mynick = newNick;

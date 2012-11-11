@@ -128,6 +128,7 @@ say = (channel, msg) ->
 
 show = (msg) ->
 	$('.chat').append "<p>#{escapeHtml msg}</p>"
+	$('.chat').scrollTop 1000000
 
 isCommand = (cmd) ->
 	cmd.match /^\//
@@ -149,7 +150,7 @@ up = ->
 		$('#cmd').val(newestCommand)
 	else
 		$('#cmd').val(history[historyIdx])
-	$('#cmd')[0].setSelectionRange(1000, 1000)
+	$('#cmd')[0].setSelectionRange(10000, 10000)
 
 down = ->
 	command = $('#cmd').val()
@@ -161,7 +162,7 @@ down = ->
 		$('#cmd').val(newestCommand)
 	else
 		$('#cmd').val(history[historyIdx])
-	$('#cmd')[0].setSelectionRange(1000, 1000)
+	$('#cmd')[0].setSelectionRange(10000, 10000)
 
 execute = (cmd) ->
 	if cmd.match /^\s*$/
@@ -171,7 +172,7 @@ execute = (cmd) ->
 	historyIdx = history.length
 	newestCommand = ''
 
-	console.log "history: #{JSON.stringify history}"
+#	console.log "history: #{JSON.stringify history}"
 
 	if isCommand cmd
 		{ command, args } = parseCommand cmd
@@ -197,7 +198,7 @@ initSocket = () ->
 	previousInfo = null
 	wasDuplicate = (info) ->
 		if JSON.stringify(previousInfo) == JSON.stringify(info)
-			console.log "### Ignoring duplicate info #{JSON.stringify info}"
+#			console.log "### Ignoring duplicate info #{JSON.stringify info}"
 			true
 		else
 			previousInfo = info
@@ -225,13 +226,10 @@ initSocket = () ->
 		show "*** pong - roundtrip #{now - backThen} ms"
 
 	socket.on 'newNick', ({ oldNick, newNick }) ->
-		console.log "newNick #{oldNick} #{newNick}"
-
 		info = { newNick: { oldNick: oldNick, newNick: newNick } }
 		if wasDuplicate(info)
 			return
 		
-		console.log "### NEWNICK #{oldNick} #{newNick}"
 		if oldNick == mynick
 			show "*** You are now known as #{newNick}."
 			mynick = newNick
