@@ -3,6 +3,10 @@
 
 Ctrl-X
 
+Nick collisions
+
+Remove pings and greeter
+
 Make scrolling work.
 
 Private messages.
