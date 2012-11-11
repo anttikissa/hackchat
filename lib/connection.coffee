@@ -32,10 +32,15 @@ module.exports.connection = (sessionStore) ->
 			console.log "*** #{session.nick} @ #{socket.id}, session updated."
 
 			if session.nick != oldSession.nick
+				data =
+					oldNick: oldSession.nick
+					newNick: session.nick
 				for channel in theSession.channels
-					channels[channel].emit 'newNick',
-						oldNick: oldSession.nick
-						newNick: session.nick
+					console.log "*** emitting nick change to channel #{channel}"
+					channels[channel].emit 'newNick', data
+				if theSession.channels.length == 0
+					console.log "*** not on channels, emitting nick change"
+					socket.emit 'newNick', data
 
 		greeter = setInterval(->
 			console.log "Saying hello to #{session.nick} @ #{socket.id}"
@@ -80,6 +85,7 @@ module.exports.connection = (sessionStore) ->
 			console.log "*** #{session.nick} @ #{socket.id} disconnected"
 			clearInterval greeter
 			sessions[sessionID].connectionClosed(socket)
+			sessionStore.removeAllListeners "#{sessionID} updated"
 
 		names = (channel) ->
 			if channels[channel]?

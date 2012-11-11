@@ -218,6 +218,8 @@ execute = function(cmd) {
 };
 
 initSocket = function() {
+  var previousCommand;
+  previousCommand = null;
   socket.on('disconnect', function() {
     show("*** Disconnected from server.");
     return connected = false;
@@ -243,6 +245,7 @@ initSocket = function() {
   socket.on('newNick', function(_arg) {
     var newNick, oldNick;
     oldNick = _arg.oldNick, newNick = _arg.newNick;
+    console.log("### NEWNICK " + oldNick + " " + newNick);
     if (oldNick === mynick) {
       show("*** You are now known as " + newNick + ".");
       mynick = newNick;

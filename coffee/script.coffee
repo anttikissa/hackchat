@@ -152,6 +152,10 @@ execute = (cmd) ->
 		else show "*** I don't know that command: #{command}."
 
 initSocket = () ->
+	# Some commands may be sent multiple times (for every channel you are on).
+	# Ignore them.
+	previousCommand = null
+
 	socket.on 'disconnect', ->
 		show "*** Disconnected from server."
 		connected = false
@@ -172,6 +176,7 @@ initSocket = () ->
 		show "PONG #{JSON.stringify data}, roundtrip #{now - backThen} ms"
 
 	socket.on 'newNick', ({ oldNick, newNick }) ->
+		console.log "### NEWNICK #{oldNick} #{newNick}"
 		if oldNick == mynick
 			show "*** You are now known as #{newNick}."
 			mynick = newNick
