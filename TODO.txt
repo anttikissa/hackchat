@@ -21,6 +21,9 @@ channel?
 
 Add timestamps to output
 
+Any unique prefix of a command should work
+
+
 
 # Solved in some way
 

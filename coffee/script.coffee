@@ -6,6 +6,21 @@ socket = io.connect()
 # List of all channels this socket is on.
 channels = []
 
+addChannel = (channel) ->
+	channels.push channel
+	$('.ifchannel').show()
+
+# Remove channel from list, return channel next to it
+removeChannel = (channel) ->
+	idx = channels.indexOf channel
+	if idx != -1
+		channels.splice idx, 1
+	if channels.length == 0
+		$('.ifchannel').hide()
+		return null
+	else
+		return channels[(idx - 1 + channels.length) % channels.length]
+
 escapeHtml = (s) ->
 	s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 	.replace(/"/g, "&quot;") .replace(/'/g, "&#039;")
@@ -25,8 +40,6 @@ join = (channel) ->
 	socket.emit 'join', channel: channel
 
 leave = (channel) ->
-	channel ?= mychannel
-	
 	if not channel
 		show '*** Please specify channel.'
 	else
@@ -34,8 +47,6 @@ leave = (channel) ->
 		socket.emit 'leave', channel: channel
 
 names = (channel) ->
-	channel ?= mychannel
-
 	if not channel
 		show '*** Please specify channel.'
 	else
@@ -111,7 +122,7 @@ execute = (cmd) ->
 		when 'say', 's' then say mychannel, args
 		when 'help', 'h' then help args
 		when 'reconnect', 're', 'reco' then reconnect()
-		when 'leave', 'le', 'part' then leave()
+		when 'leave', 'le', 'part' then leave args[0] ? mychannel
 		else show "*** I don't know that command: #{command}."
 
 mynick = null
@@ -164,7 +175,7 @@ initSocket = () ->
 			if channel in channels
 				tellUser = false
 			else
-				channels.push channel
+				addChannel channel
 				show "*** channels this socket is on: #{channels.join ' '}"
 
 		if tellUser
@@ -173,10 +184,11 @@ initSocket = () ->
 	socket.on 'leave', ({ nick, channel }) ->
 		show "*** #{nick} has left channel ##{channel}."
 
-		# TODO figure out other channel
 		if nick == mynick
-			$('.mychannel').html('')
-			mychannel = null
+			nextChannel = removeChannel channel
+			if mychannel == channel
+				mychannel = nextChannel
+				$('.mychannel').html(nextChannel ? '')
 
 	socket.on 'say', ({ nick, channel, msg }) ->
 		show "<#{nick} ##{channel}> #{msg}"
@@ -185,18 +197,6 @@ $ ->
 	mynick = $('.mynick').html()
 
 	initSocket()
-
-	$('#ping').click ->
-		ping()
-
-	$('#nick').change ->
-		newNick($('#nick').val())
-
-	$('#channel').change ->
-		join($('#channel').val())
-
-	$('#msg').change ->
-		say($('#sayChannel').val(), $('#msg').val())
 
 	focus = ->
 		$('#cmd').focus()# unless mousedown

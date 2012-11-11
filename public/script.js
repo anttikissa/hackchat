@@ -1,4 +1,4 @@
-var channels, connected, escapeHtml, execute, help, initSocket, isCommand, join, leave, mychannel, mynick, names, newNick, parseCommand, ping, reconnect, sanitize, say, show, socket,
+var addChannel, channels, connected, escapeHtml, execute, help, initSocket, isCommand, join, leave, mychannel, mynick, names, newNick, parseCommand, ping, reconnect, removeChannel, sanitize, say, show, socket,
   __slice = [].slice,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -7,6 +7,25 @@ connected = false;
 socket = io.connect();
 
 channels = [];
+
+addChannel = function(channel) {
+  channels.push(channel);
+  return $('.ifchannel').show();
+};
+
+removeChannel = function(channel) {
+  var idx;
+  idx = channels.indexOf(channel);
+  if (idx !== -1) {
+    channels.splice(idx, 1);
+  }
+  if (channels.length === 0) {
+    $('.ifchannel').hide();
+    return null;
+  } else {
+    return channels[(idx - 1 + channels.length) % channels.length];
+  }
+};
 
 escapeHtml = function(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
@@ -36,9 +55,6 @@ join = function(channel) {
 };
 
 leave = function(channel) {
-  if (channel == null) {
-    channel = mychannel;
-  }
   if (!channel) {
     return show('*** Please specify channel.');
   } else {
@@ -50,9 +66,6 @@ leave = function(channel) {
 };
 
 names = function(channel) {
-  if (channel == null) {
-    channel = mychannel;
-  }
   if (!channel) {
     return show('*** Please specify channel.');
   } else {
@@ -132,7 +145,7 @@ parseCommand = function(cmd) {
 };
 
 execute = function(cmd) {
-  var args, command, _ref, _ref1, _ref2;
+  var args, command, _ref, _ref1, _ref2, _ref3;
   if (isCommand(cmd)) {
     _ref = parseCommand(cmd), command = _ref.command, args = _ref.args;
   } else {
@@ -165,7 +178,7 @@ execute = function(cmd) {
     case 'leave':
     case 'le':
     case 'part':
-      return leave();
+      return leave((_ref3 = args[0]) != null ? _ref3 : mychannel);
     default:
       return show("*** I don't know that command: " + command + ".");
   }
@@ -232,7 +245,7 @@ initSocket = function() {
       if (__indexOf.call(channels, channel) >= 0) {
         tellUser = false;
       } else {
-        channels.push(channel);
+        addChannel(channel);
         show("*** channels this socket is on: " + (channels.join(' ')));
       }
     }
@@ -241,12 +254,15 @@ initSocket = function() {
     }
   });
   socket.on('leave', function(_arg) {
-    var channel, nick;
+    var channel, nextChannel, nick;
     nick = _arg.nick, channel = _arg.channel;
     show("*** " + nick + " has left channel #" + channel + ".");
     if (nick === mynick) {
-      $('.mychannel').html('');
-      return mychannel = null;
+      nextChannel = removeChannel(channel);
+      if (mychannel === channel) {
+        mychannel = nextChannel;
+        return $('.mychannel').html(nextChannel != null ? nextChannel : '');
+      }
     }
   });
   return socket.on('say', function(_arg) {
@@ -260,18 +276,6 @@ $(function() {
   var focus;
   mynick = $('.mynick').html();
   initSocket();
-  $('#ping').click(function() {
-    return ping();
-  });
-  $('#nick').change(function() {
-    return newNick($('#nick').val());
-  });
-  $('#channel').change(function() {
-    return join($('#channel').val());
-  });
-  $('#msg').change(function() {
-    return say($('#sayChannel').val(), $('#msg').val());
-  });
   focus = function() {
     return $('#cmd').focus();
   };

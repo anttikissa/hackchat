@@ -161,3 +161,6 @@ body {
 .input input:focus {
   outline: none;
 }
+.input .ifchannel {
+  display: none;
+}
