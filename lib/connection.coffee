@@ -43,10 +43,10 @@ module.exports.connection = (sessionStore) ->
 #					console.log "*** not on channels, emitting nick change"
 					socket.emit 'newNick', data
 
-		greeter = setInterval(->
-			console.log "Saying hello to #{session.nick} @ #{socket.id}"
-			socket.emit 'msg', { from: 'server', msg: "hello #{session.nick}!" }
-		,	20000)
+#		greeter = setInterval(->
+#			console.log "Saying hello to #{session.nick} @ #{socket.id}"
+#			socket.emit 'msg', { from: 'server', msg: "hello #{session.nick}!" }
+#		,	20000)
 
 		socket.on 'ping', (data) ->
 			console.log "(#{session.nick} @ #{socket.id}) PING #{JSON.stringify data}"
@@ -84,7 +84,7 @@ module.exports.connection = (sessionStore) ->
 
 		socket.on 'disconnect', ->
 			console.log "*** #{session.nick} @ #{socket.id} disconnected"
-			clearInterval greeter
+#			clearInterval greeter
 			sessions[sessionID].connectionClosed(socket)
 			sessionStore.removeAllListeners "#{sessionID} updated"
 
