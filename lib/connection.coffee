@@ -12,6 +12,9 @@ Channel = channelUtil.Channel
 sanitize = (channel) ->
 	channel.replace /^#+/, ''
 
+# Popular channels
+populars = []
+
 # Handles a connection with a single socket.io client (i.e. a browser window).
 
 module.exports.connection = (sessionStore) ->
@@ -70,12 +73,24 @@ module.exports.connection = (sessionStore) ->
 		socket.on 'say', ({ channel, msg }) ->
 			if channels[channel]?.has sessionID
 				console.log "*** <#{session.nick}:##{channel}> #{msg}"
+
+				populars.unshift channel
+				if populars.length > 3
+					populars.length = 3
+
 				channels[channel].emit 'say',
 					nick: session.nick,
 					channel: channel,
 					msg: msg
 			else
 				socket.emit 'info', { msg: "You're not on #{channel}. Cannot say." }
+
+		showPopulars = ->
+			pops = []
+			for pop in populars
+				pops.push "#" + pop
+
+			socket.emit 'info', { msg: "Popular channels: #{pops.join ' '}" }
 
 		socket.on 'list', ->
 			chans = _.keys channels
@@ -146,5 +161,6 @@ module.exports.connection = (sessionStore) ->
 
 		socket.emit 'info', { msg: "Welcome to HackChat!" }
 		socket.emit 'info', { msg: "Type /help to get help." }
+		showPopulars()
 		socket.emit 'info', { msg: "Join #nodeknockout for general chat, #feedback for giving feedback." }
 
