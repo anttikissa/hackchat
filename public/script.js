@@ -255,6 +255,7 @@ initSocket = function() {
   socket.on('newNick', function(_arg) {
     var info, newNick, oldNick;
     oldNick = _arg.oldNick, newNick = _arg.newNick;
+    console.log("newNick " + oldNick + " " + newNick);
     info = {
       newNick: {
         oldNick: oldNick,
@@ -331,7 +332,6 @@ $(function() {
   clicks = 0;
   timer = null;
   $(window).click(function(e) {
-    console.log("### Click.");
     clicks++;
     if (clicks === 1) {
       return timer = setTimeout(function() {

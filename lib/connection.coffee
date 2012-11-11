@@ -27,20 +27,18 @@ module.exports.connection = (sessionStore) ->
 
 		sessionStore.on "#{sessionID} updated", (newSession) ->
 			oldSession = session
-#			console.log "*** #{session.nick} @ #{socket.id}, updating session..."
 			session = newSession
-#			console.log "*** #{session.nick} @ #{socket.id}, session updated."
 
 			if session.nick != oldSession.nick
 				console.log "*** #{oldSession.nick} is now known as #{session.nick}"
 				data =
 					oldNick: oldSession.nick
 					newNick: session.nick
-				for channel in theSession.channels
-					console.log "*** emitting nick change to channel #{channel}"
+				for channel of theSession.channels
+#					console.log "*** emitting nick change to channel #{channel}"
 					channels[channel].emit 'newNick', data
-				if theSession.channels.length == 0
-					console.log "*** not on channels, emitting nick change"
+				if _.keys(theSession.channels).length == 0
+#					console.log "*** not on channels, emitting nick change"
 					socket.emit 'newNick', data
 
 #		greeter = setInterval(->
@@ -52,7 +50,6 @@ module.exports.connection = (sessionStore) ->
 			socket.emit 'pong', data
 
 		socket.on 'newNick', ({ newNick }) ->
-#			console.log "*** #{session.nick} wants new nick: #{JSON.stringify newNick}"
 			if newNick == session.nick
 				socket.emit 'info', { msg: "You're already known as #{newNick}." }
 				return
@@ -67,13 +64,12 @@ module.exports.connection = (sessionStore) ->
 						if err
 							console.log "Error saving session #{sessionID}"
 					sessionStore.emit("#{sessionID} updated", newSession)
-
 			else
-				socket.emit 'info', { msg: "Invalid nick. Must be alphanumeric & at most 15 characters long." }
+				socket.emit 'info', { msg: "Invalid nick. Must be alphanumeric and at most 15 characters long." }
 
 		socket.on 'say', ({ channel, msg }) ->
 			if channels[channel]?.has sessionID
-				console.log "*** <#{session.nick} #{channel}> #{msg}"
+				console.log "*** <#{session.nick}:##{channel}> #{msg}"
 				channels[channel].emit 'say',
 					nick: session.nick,
 					channel: channel,

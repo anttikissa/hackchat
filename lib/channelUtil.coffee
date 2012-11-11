@@ -34,12 +34,13 @@ class Channel
 					return cb null, result
 
 	emit: (what, data) ->
-#		console.log "*** Channel ##{@name} emitting #{what}: #{JSON.stringify data}"
+		console.log "*** Channel ##{@name} emitting #{what}: #{JSON.stringify data}"
 		for sessionID in @members
 			theSession = sessions[sessionID]
 			for socket in theSession.connections
 #				console.log "*** Considering socket #{socket.id}."
 				if theSession.isSocketListeningTo socket, @name
+#					console.log "*** It was good. #{socket.id}."
 					socket.emit what, data
 		
 	hello: ->	
@@ -47,7 +48,8 @@ class Channel
 
 module.exports.Channel = Channel
 module.exports.validChannelName = (channel) ->
-	okChars = channel.match /^[a-z0-9_]+$/
+	channel = channel.toLowerCase()
+	okChars = channel.match /^[a-z0-9_-]+$/
 	okLength = channel.length <= 25
 	okChars and okLength
 

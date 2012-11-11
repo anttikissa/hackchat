@@ -183,6 +183,8 @@ initSocket = () ->
 		show "*** pong - roundtrip #{now - backThen} ms"
 
 	socket.on 'newNick', ({ oldNick, newNick }) ->
+		console.log "newNick #{oldNick} #{newNick}"
+
 		info = { newNick: { oldNick: oldNick, newNick: newNick } }
 		if wasDuplicate(info)
 			return
@@ -244,7 +246,6 @@ $ ->
 	timer = null
 
 	$(window).click (e) ->
-		console.log "### Click."
 		clicks++
 		if clicks == 1
 			timer = setTimeout(->
