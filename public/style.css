@@ -131,7 +131,6 @@ table {
   font-family: source-code-pro, 'Courier New', Courier, monospace;
   line-height: 20px;
   font-weight: 100;
-  color: #444;
 }
 body {
   font-size: 16px;
@@ -170,9 +169,23 @@ body {
   padding-left: 16px;
   padding-right: 16px;
   padding-bottom: 3px;
+  color: #888;
+  background-color: #f7f7f7;
+  -webkit-transition: color 1s ease 0.5s;
+  -webkit-transition-property: color, background-color;
+  -moz-transition: color 1s ease 0.5s;
+  -moz-transition-property: color, background-color;
 }
 .input td.pre {
   white-space: nowrap;
+}
+.input.focus {
+  color: #000;
+  background-color: #fff;
+  -webkit-transition: color 0.1s ease;
+  -webkit-transition-property: color, background-color;
+  -moz-transition: color 0.1s ease;
+  -moz-transition-property: color, background-color;
 }
 .input input {
   width: 100%;
@@ -182,10 +195,21 @@ body {
   font-family: source-code-pro, 'Courier New', Courier, monospace;
   line-height: 20px;
   font-weight: 100;
-  color: #444;
+  color: #888;
+  background-color: #f7f7f7;
+  -webkit-transition: color 1s ease 0.5s;
+  -webkit-transition-property: color, background-color;
+  -moz-transition: color 1s ease 0.5s;
+  -moz-transition-property: color, background-color;
 }
 .input input:focus {
   outline: none;
+  color: #000;
+  background-color: #fff;
+  -webkit-transition: color 0.1s ease;
+  -webkit-transition-property: color, background-color;
+  -moz-transition: color 0.1s ease;
+  -moz-transition-property: color, background-color;
 }
 .input .ifchannel {
   display: none;

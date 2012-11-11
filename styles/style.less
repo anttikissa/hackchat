@@ -5,11 +5,11 @@
 	font-family: source-code-pro, 'Courier New', Courier, monospace;
 	line-height: 20px;
     font-weight: 100;
-    color: #444;
 }
 
 body {
 	.text;
+    color: #444;
 }
 
 .page {
@@ -55,13 +55,43 @@ body {
 		white-space: nowrap;
 	}
 
+	color: #888;
+	background-color: #f7f7f7;
+	-webkit-transition: color 1s ease 0.5s;
+	-webkit-transition-property: color, background-color;
+	-moz-transition: color 1s ease 0.5s;
+	-moz-transition-property: color, background-color;
+
+	&.focus {
+		color: #000;
+		background-color: #fff;
+		-webkit-transition: color 0.1s ease;
+		-webkit-transition-property: color, background-color;
+		-moz-transition: color 0.1s ease;
+		-moz-transition-property: color, background-color;
+	}
+
 	input {
 		width: 100%;
 		background: none;
 		border: none;
 		.text;
+
+		color: #888;
+		background-color: #f7f7f7;
+		-webkit-transition: color 1s ease 0.5s;
+		-webkit-transition-property: color, background-color;
+		-moz-transition: color 1s ease 0.5s;
+		-moz-transition-property: color, background-color;
 		&:focus {
 			outline: none;
+//			color: auto;
+			color: #000;
+			background-color: #fff;
+			-webkit-transition: color 0.1s ease;
+			-webkit-transition-property: color, background-color;
+			-moz-transition: color 0.1s ease;
+			-moz-transition-property: color, background-color;
 		}
 	}
 
@@ -69,5 +99,4 @@ body {
 		display: none;
 	}
 }
-
 

@@ -240,9 +240,8 @@ $ ->
 	initSocket()
 
 	focus = ->
-		$('#cmd').focus()# unless mousedown
+		$('#cmd').focus()
 	focus()
-#	setInterval(focus, 300)
 
 	clicks = 0
 	timer = null
@@ -271,6 +270,11 @@ $ ->
 			cmd = $(event.target).val()
 			execute(cmd)
 			$(event.target).val('')
+
+	$('#cmd').focus ->
+		$('.input').addClass('focus')
+	$('#cmd').blur ->
+		$('.input').removeClass('focus')
 
 	initialChannels = (window.location.hash.replace /^#/, '').trim().split ','
 

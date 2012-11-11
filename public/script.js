@@ -368,6 +368,12 @@ $(function() {
       return $(event.target).val('');
     }
   });
+  $('#cmd').focus(function() {
+    return $('.input').addClass('focus');
+  });
+  $('#cmd').blur(function() {
+    return $('.input').removeClass('focus');
+  });
   initialChannels = (window.location.hash.replace(/^#/, '')).trim().split(',');
   for (_i = 0, _len = initialChannels.length; _i < _len; _i++) {
     c = initialChannels[_i];
