@@ -23,7 +23,7 @@ module.exports.connection = (sessionStore) ->
 		theSession = sessions[sessionID]
 		sessions[sessionID].newConnection(socket)
 
-		console.log "*** #{session.nick} @ #{socket.id} connected"
+		console.log "*** #{session.nick}/#{sessionID} @ #{socket.id} connected"
 
 		sessionStore.on "#{sessionID} updated", (newSession) ->
 			oldSession = session
