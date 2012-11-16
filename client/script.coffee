@@ -60,6 +60,7 @@ escapeHtml = (s) ->
 
 ping = ->
 	socket.emit 'ping', ts: new Date().getTime()
+#	socket.send "Hello, I'm sending a message."
 
 newNick = (newNick) ->
 	socket.emit 'newNick', newNick: newNick
@@ -229,7 +230,7 @@ initSocket = () ->
 	socket.on 'connect', ->
 		show "*** Connected to server."
 		connected = true
-#		ping()
+		ping()
 		for channel in channels
 			join channel
 

@@ -6,6 +6,8 @@ RedisStore = require('connect-redis')(express)
 cookie = require 'cookie'
 parseSignedCookie = require('connect/lib/utils').parseSignedCookie
 _ = require 'underscore'
+fs = require 'fs'
+{ Chat } = require './chat'
 
 # packageJson = require './package.json'
 # would be nice but doesn't work on custom domain
@@ -15,6 +17,13 @@ sessions = require './sessions'
 sessionUtil = require './sessionUtil'
 Session = sessionUtil.Session
 
+sessionStore = new RedisStore(host: 'nodejitsudb6214129596.redis.irstack.com', pass: 'nodejitsudb6214129596.redis.irstack.com:f327cfe980c971946e80b8e975fbebb4')
+sessionStore.setMaxListeners(1024)
+
+#connection = require('./connection').connection(sessionStore)
+
+chat = new Chat(sessionStore)
+
 run = ->
 	app = express()
 	server = http.createServer app
@@ -22,17 +31,13 @@ run = ->
 
 	io.set 'log level', 1
 
-	sessionStore = new RedisStore(host: 'nodejitsudb6214129596.redis.irstack.com', pass: 'nodejitsudb6214129596.redis.irstack.com:f327cfe980c971946e80b8e975fbebb4')
-	sessionStore.setMaxListeners(1024)
-
-	connection = require('./connection').connection(sessionStore)
-
 	app.set 'views', 'client'
 
 	secret = 'l6fsJUF)JH3JV6^'
 
+	logfile = fs.createWriteStream('access.log', { flags: 'a' })
 	app.use express.favicon()
-	app.use express.logger()
+	app.use express.logger(stream: logfile)
 	app.use express.cookieParser(secret)
 	app.use express.session(key: 's', store: sessionStore)
 	app.use compiler {
@@ -91,7 +96,8 @@ run = ->
 				data.session = session
 				cb null, true
 
-	io.on 'connection', connection
+	io.on 'connection', (socket) ->
+		chat.socketConnected socket
 
 	server.listen 3000
 	console.log 'http://localhost:3000'
