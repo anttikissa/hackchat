@@ -102,7 +102,7 @@ run = ->
 		chat.socketConnected socket
 
 	server.listen 3000
-	log.d 'http://localhost:3000'
+	log.d 'Listening to http://localhost:3000'
 
 module.exports.run = run
 
