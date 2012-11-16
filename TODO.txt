@@ -1,7 +1,10 @@
 
 # Items to do
 
-/list
+Reorganize code.
+
+See what ircII does better when joining a channel. (Listing the participants,
+how does it look?)
 
 Topics
 
