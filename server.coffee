@@ -28,7 +28,7 @@ sessionStore.setMaxListeners(1024)
 
 connection = require('./lib/connection').connection(sessionStore)
 
-app.set 'views', 'views'
+app.set 'views', 'client'
 
 secret = 'l6fsJUF)JH3JV6^'
 
@@ -38,7 +38,7 @@ app.use express.cookieParser(secret)
 app.use express.session(key: 's', store: sessionStore)
 app.use compiler {
 	enabled: ['coffee', 'less'],
-	roots: [['coffee', 'public'], ['styles', 'public']]
+	roots: [['client', 'public']]
 }
 app.use express.static('public')
 
