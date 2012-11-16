@@ -244,12 +244,12 @@ initSocket = () ->
 		now = new Date().getTime()
 		show "*** pong - roundtrip #{now - backThen} ms"
 
-	socket.on 'newNick', ({ oldNick, newNick }) ->
+	socket.on 'nick', ({ oldNick, newNick, you }) ->
 		info = { newNick: { oldNick: oldNick, newNick: newNick } }
 		if wasDuplicate(info)
 			return
-		
-		if oldNick == mynick
+
+		if you?
 			show "*** You are now known as #{newNick}."
 			mynick = newNick
 			$('.mynick').html(newNick)

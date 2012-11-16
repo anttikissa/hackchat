@@ -16,7 +16,10 @@ class Chat
 		socket.on 'disconnect', =>
 			@socketDisconnected socket
 
+		socket.user.socketConnected(socket)
+
 	socketDisconnected: (socket) ->
 		log.d "socket closed #{socket.id}"
+		socket.user.socketDisconnected(socket)
 
 module.exports.Chat = Chat

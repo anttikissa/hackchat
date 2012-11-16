@@ -333,9 +333,9 @@ initSocket = function() {
     now = new Date().getTime();
     return show("*** pong - roundtrip " + (now - backThen) + " ms");
   });
-  socket.on('newNick', function(_arg) {
-    var info, newNick, oldNick;
-    oldNick = _arg.oldNick, newNick = _arg.newNick;
+  socket.on('nick', function(_arg) {
+    var info, newNick, oldNick, you;
+    oldNick = _arg.oldNick, newNick = _arg.newNick, you = _arg.you;
     info = {
       newNick: {
         oldNick: oldNick,
@@ -345,7 +345,7 @@ initSocket = function() {
     if (wasDuplicate(info)) {
       return;
     }
-    if (oldNick === mynick) {
+    if (you != null) {
       show("*** You are now known as " + newNick + ".");
       mynick = newNick;
       return $('.mynick').html(newNick);
