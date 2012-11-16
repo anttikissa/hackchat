@@ -63,7 +63,7 @@ ping = ->
 #	socket.send "Hello, I'm sending a message."
 
 newNick = (newNick) ->
-	socket.emit 'newNick', newNick: newNick
+	socket.emit 'nick', newNick: newNick
 
 join = (channel) ->
 	channel = sanitize channel

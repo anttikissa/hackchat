@@ -77,7 +77,7 @@ ping = function() {
 };
 
 newNick = function(newNick) {
-  return socket.emit('newNick', {
+  return socket.emit('nick', {
     newNick: newNick
   });
 };

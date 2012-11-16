@@ -1,4 +1,16 @@
 { log, s } = require '../lib/utils'
+{ sessionStore } = require './sessionStore'
+
+# Nick utilities.
+
+validNick = (nick) ->
+	nick = nick.toLowerCase()
+	okChars = nick.match /^[a-z0-9_]+$/
+	okLength = nick.length <= 15
+	okChars and okLength
+
+nickTaken = (nick) ->
+	false
 
 newNick = () ->
 	t = new Date().getTime() % 456976
@@ -7,11 +19,6 @@ newNick = () ->
 class User
 	# sessionID -> User
 	@users: { }
-
-	# connect middleware for attaching/initializing user sessions
-	@handleUserSession: (req, resp, next) =>
-		@getUser(req.sessionID, req.session)
-		next()
 
 	# Called from HTTP and WebSocket entry points to make sure that we can
 	# associate sessionID to an User object.
@@ -22,20 +29,39 @@ class User
 		@users[sessionID]
 
 	constructor: (@sessionID, @session) ->
-		log.d "### Creating new user for id #{sessionID}"
+		log.d "Creating new user for id #{sessionID}"
 
 		if not @session.nick?
 			nick = newNick()
-			log "*** #{@sessionID} is new user, giving nick #{nick}"
+			log.d "#{@sessionID} is new user, giving nick #{nick}"
 			@session.nick = newNick()
 		else
-			log "*** #{@sessionID} is returning user with nick #{@session.nick}"
+			log.d "#{@sessionID} is returning user with nick #{@session.nick}"
 
 	toString: ->
-		"#{@sessionID.substr(0,6)} <#{@session.nick}>"
+		"<#{@session.nick}> (#{@sessionID.substr(0,6)})"
+
+	info: (msg) ->
+		log "TODO send info to user"
 
 	changeNick: (newNick) ->
-		console.log "### User changing nick!"
+		if newNick == @session.nick
+			return @info "You're already known as #{newNick}."
+
+		if !validNick newNick
+			return @info "Invalid nick. Must be alphanumeric and at most 15 characters long."
+		if nickTaken newNick
+			return @info "Nick already in use."
+
+		log "*** #{this} is now known as #{newNick}"
+		@session.nick = newNick
+		sessionStore.set @sessionID, @session, (err) ->
+			if err
+				log.e "sessionStore.set #{@sessionID} error: #{err}"
+			
+		# TODO save session
+			
+		# TODO broadcast on user's channels and sockets, too
 
 module.exports.User = User
 
