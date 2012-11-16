@@ -62,6 +62,7 @@ class User
 			console.log "Emitting to #{id}: #{what} #{s data}"
 			socket.emit what, data
 
+	# Commands sent by client
 	changeNick: (newNick) ->
 		oldNick = @session.nick
 
@@ -81,6 +82,9 @@ class User
 	
 		@emit 'nick', { oldNick: oldNick, newNick: newNick, you: true }
 		# TODO broadcast on user's channels, too
+	
+	join: (channel) ->
+		log "User joining #{channel}"
 
 module.exports.User = User
 

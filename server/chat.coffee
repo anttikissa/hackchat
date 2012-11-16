@@ -1,4 +1,4 @@
-{ log } = require '../lib/utils'
+{ log, s } = require '../lib/utils'
 
 class Chat
 	connections: {}
@@ -6,17 +6,23 @@ class Chat
 	constructor: () ->
 
 	socketConnected: (socket) ->
-		socket.user = socket.handshake.user
-#		@connections[socket.id] = 
-		log.d "new socket #{socket.id} for user #{socket.user}"
+		user = socket.user = socket.handshake.user
+#		log.d "new socket #{socket.id} for user #{socket.user}"
+
 		socket.on 'ping', (data) ->
+			log "*** #{user} ping"
 			socket.emit 'pong', data
+
+		socket.on 'join', ({ channel }) ->
+			user.join channel
+
 		socket.on 'nick', ({ newNick }) ->
-			socket.user.changeNick(newNick)
+			user.changeNick(newNick)
+
 		socket.on 'disconnect', =>
 			@socketDisconnected socket
 
-		socket.user.socketConnected(socket)
+		user.socketConnected(socket)
 
 	socketDisconnected: (socket) ->
 		log.d "socket closed #{socket.id}"
