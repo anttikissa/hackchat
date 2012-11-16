@@ -6,9 +6,9 @@
   ],
   "version": "0.0.6",
   "description": "Hack hack hack",
-  "main": "server.coffee",
+  "main": "run.coffee",
   "scripts": {
-    "start": "coffee server.coffee"
+    "start": "coffee run.coffee"
   },
   "repository": {
     "type": "git",
