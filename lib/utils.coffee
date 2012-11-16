@@ -16,5 +16,8 @@ log.e = (msg) ->
 	msg ?= ''
 	console.err "#{time()}[ERROR] #{msg}"
 
+s = -> JSON.stringify arguments...
+
 module.exports.log = log
+module.exports.s = s
 

@@ -1,10 +1,13 @@
 { log } = require '../lib/utils'
 
 class Chat
+	connections: {}
+
 	constructor: (@sessionStore) ->
 
 	socketConnected: (socket) ->
-		log.d "new socket #{socket.id}"
+#		@connections[socket.id] = 
+		log.d "new socket #{socket.id} for user #{socket.handshake.user}"
 		socket.on 'ping', (data) ->
 			socket.emit 'pong', data
 		socket.on 'disconnect', =>

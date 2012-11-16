@@ -8,6 +8,7 @@ parseSignedCookie = require('connect/lib/utils').parseSignedCookie
 _ = require 'underscore'
 fs = require 'fs'
 { Chat } = require './chat'
+{ User } = require './user'
 
 { log } = require '../lib/utils'
 
@@ -64,13 +65,7 @@ run = ->
 			resp.send 'Fail', 404
 
 	app.use (req, resp, next) ->
-		if not req.session.nick?
-			nick = newNick()
-			log "*** #{req.sessionID} is new user, giving nick #{nick}"
-			req.session.nick = newNick()
-		else
-			log "*** #{req.sessionID} is returning user with nick #{req.session.nick}"
-
+		User.getOrInitUser(req.sessionID, req.session)
 		next()
 
 	app.get '/', (req, resp) ->
@@ -96,6 +91,7 @@ run = ->
 			else
 				data.sessionID = sessionID
 				data.session = session
+				data.user = User.getOrInitUser sessionID, session
 				cb null, true
 
 	io.on 'connection', (socket) ->

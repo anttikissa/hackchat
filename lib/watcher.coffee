@@ -13,6 +13,6 @@ run = (dirs, cb) ->
 				fs.watch filename, (event, ignoredFilename) ->
 					do (filename) ->
 						cb filename
-		log.d "Watching changes in #{dir}/*.coffee [#{matching} file#{if matching != 1 then "s" else ""}]"
+#		log.d "Watching changes in #{dir}/*.coffee [#{matching} file#{if matching != 1 then "s" else ""}]"
 
 module.exports.run = run
