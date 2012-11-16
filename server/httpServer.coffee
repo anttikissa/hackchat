@@ -9,6 +9,8 @@ _ = require 'underscore'
 fs = require 'fs'
 { Chat } = require './chat'
 
+{ log } = require '../lib/utils'
+
 # packageJson = require './package.json'
 # would be nice but doesn't work on custom domain
 packageJson = { version: '0.0.6' }
@@ -64,10 +66,10 @@ run = ->
 	app.use (req, resp, next) ->
 		if not req.session.nick?
 			nick = newNick()
-			console.log "*** #{req.sessionID} is new user, giving nick #{nick}"
+			log "*** #{req.sessionID} is new user, giving nick #{nick}"
 			req.session.nick = newNick()
 		else
-			console.log "*** #{req.sessionID} is returning user with nick #{req.session.nick}"
+			log "*** #{req.sessionID} is returning user with nick #{req.session.nick}"
 
 		next()
 
@@ -100,7 +102,7 @@ run = ->
 		chat.socketConnected socket
 
 	server.listen 3000
-	console.log 'http://localhost:3000'
+	log.d 'http://localhost:3000'
 
 module.exports.run = run
 
