@@ -1,6 +1,6 @@
 _ = require 'underscore'
 
-{ log, s } = require '../lib/utils'
+{ log, s, sanitizeChannel } = require '../lib/utils'
 { sessionStore } = require './sessionStore'
 { Channel } = require './channel'
 
@@ -54,6 +54,11 @@ class User
 		delete @sockets[socket.id]
 		log.d "#{this}: socket disconnected. Sockets: #{_.keys(@sockets).join ' '}"
 
+	saveSession: ->
+		sessionStore.set @sessionID, @session, (err) ->
+			if err
+				log.e "sessionStore.set #{@sessionID} error: #{err}"
+
 	nick: ->
 		@session.nick
 
@@ -65,7 +70,6 @@ class User
 
 	emit: (what, data) ->
 		for id, socket of @sockets
-			console.log "Emitting to #{id}: #{what} #{s data}"
 			socket.emit what, data
 
 	# Commands sent by client
@@ -80,25 +84,39 @@ class User
 		if nickTaken newNick
 			return @info "Nick already in use."
 
-		log "*** #{this} is now known as #{newNick}"
+		log "*** #{this} is now known as #{newNick}."
 		@session.nick = newNick
-		sessionStore.set @sessionID, @session, (err) ->
-			if err
-				log.e "sessionStore.set #{@sessionID} error: #{err}"
+		@saveSession()
 	
 		@emit 'nick', { oldNick, newNick, you: true }
 		@broadcast 'nick', { oldNick, newNick }
 
+	say: (channelName, msg) ->
+		if not channelName
+			return @info "Please specify channel."
+		if not msg
+			return @info "Please specify message."
+
+		channelName = sanitizeChannel channelName
+		channel = @channels[channelName]
+		if not channel
+			return @info "You're not on channel ##{channelName}."
+
+		channel.say this, msg
+
+		# TODO where does this belong?
+		log "*** <#{@nick()}:#{channel}> #{msg}"
+		
 	broadcast: (what, data) ->
 		for id, channel of @channels
 			channel.emit what, data
 
 	join: (channel) ->
-		if @channels[channel]
+		if @channels[channel.id]
 			return
-		log "User.join #{channel}"
-		@channels[channel] = channel
-		# TODO save channels to session
+		@channels[channel.id] = channel
+		@session.channels = _.keys @channels
+		@saveSession()
 
 module.exports.User = User
 

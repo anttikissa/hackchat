@@ -7,11 +7,16 @@ class Channel
 		@users = {}
 		log "new channel #{this}"
 
+#	has: (user) ->
+#		user.id of @users
+#
 	join: (user) ->
-		log "Channel.join #{user}"
 		@users[user.id] = user
 #		@emit 'info', { msg: "#{user.nick()} has joined channel #{this}" }
-		@emit 'join', { nick: user.nick(), channel: @id }
+		@emit 'join', nick: user.nick(), channel: @id
+
+	say: (user, msg) ->
+		@emit 'say', nick: user.nick(), channel: @id, msg: msg
 
 	emit: (what, data) ->
 		for id, user of @users

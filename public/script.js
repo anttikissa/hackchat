@@ -343,7 +343,6 @@ initSocket = function() {
       }
     };
     if (wasDuplicate(info)) {
-      console.log("duplicate");
       return;
     }
     if (you != null) {

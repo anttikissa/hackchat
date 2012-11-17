@@ -18,6 +18,11 @@ log.e = (msg) ->
 
 s = -> JSON.stringify arguments...
 
+# Remove excess #'s from the beginning.
+sanitizeChannel = (channel) ->
+	channel.replace /^#+/, ''
+
 module.exports.log = log
 module.exports.s = s
+module.exports.sanitizeChannel = sanitizeChannel
 
