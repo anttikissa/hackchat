@@ -37,8 +37,7 @@ class User
 		@sockets = {}
 		@channels = {}
 
-		log.d "Creating new user for id #{sessionID}"
-
+		log "session is #{s @session}"
 		if not @session.nick?
 			nick = newNick()
 			log.d "#{@sessionID} is new user, giving nick #{nick}"
@@ -46,9 +45,21 @@ class User
 		else
 			log.d "#{@sessionID} is returning user with nick #{@session.nick}"
 
+		if not @session.channels
+			@session.channels = []
+			
+		for channelName in @session.channels
+			log.d "Restoring user-channel bond: #{@nick()}, #{channelName}"
+			channel = Channel.get channelName
+			channel.join this, silent: true
+			@join channel, nosave: true
+
+		log.d "Creating new user for id #{sessionID}"
+
 	socketConnected: (socket) ->
 		@sockets[socket.id] = socket
 		log.d "#{this}: connected. Sockets: #{_.keys(@sockets).join ' '}"
+		log.d "TODO Tell socket that we're on channels #{_.keys @channels}"
 
 	socketDisconnected: (socket) ->
 		delete @sockets[socket.id]
@@ -69,7 +80,9 @@ class User
 		@emit 'info', { msg: msg }
 
 	emit: (what, data) ->
+#		log "Emit #{what} to sockets..."
 		for id, socket of @sockets
+#			log "Emit #{what} to socket #{id}..."
 			socket.emit what, data
 
 	# Commands sent by client
@@ -111,12 +124,14 @@ class User
 		for id, channel of @channels
 			channel.emit what, data
 
-	join: (channel) ->
+	join: (channel, opts) ->
+#		log "User.join #{channel}"
 		if @channels[channel.id]
 			return
 		@channels[channel.id] = channel
-		@session.channels = _.keys @channels
-		@saveSession()
+		unless opts?.nosave
+			@session.channels = _.keys @channels
+			@saveSession()
 
 module.exports.User = User
 

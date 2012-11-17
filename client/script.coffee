@@ -230,8 +230,8 @@ initSocket = () ->
 		show "*** Connected to server."
 		connected = true
 		ping()
-		for channel in channels
-			join channel
+#		for channel in channels
+#			join channel
 
 	socket.on 'names', ({ channel, names }) ->
 		names.sort()
@@ -267,6 +267,7 @@ initSocket = () ->
 		show "<#{from}> #{msg}"
 
 	socket.on 'join', ({ nick, channel }) ->
+#		show "Join #{nick} #{channel}"
 		tellUser = true
 		if nick == mynick
 			setChannel(channel)

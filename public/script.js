@@ -309,16 +309,9 @@ initSocket = function() {
     return connected = false;
   });
   socket.on('connect', function() {
-    var channel, _i, _len, _results;
     show("*** Connected to server.");
     connected = true;
-    ping();
-    _results = [];
-    for (_i = 0, _len = channels.length; _i < _len; _i++) {
-      channel = channels[_i];
-      _results.push(join(channel));
-    }
-    return _results;
+    return ping();
   });
   socket.on('names', function(_arg) {
     var channel, names;
