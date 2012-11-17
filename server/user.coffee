@@ -2,8 +2,9 @@ _ = require 'underscore'
 
 { log, s } = require '../lib/utils'
 { sessionStore } = require './sessionStore'
+{ Channel } = require './channel'
 
-# Nick utilities.
+# Utilities.
 
 validNick = (nick) ->
 	nick = nick.toLowerCase()
@@ -31,8 +32,10 @@ class User
 		@users[sessionID]
 
 	constructor: (@sessionID, @session) ->
+		@id = @sessionID
 		# socket id -> socket
 		@sockets = {}
+		@channels = {}
 
 		log.d "Creating new user for id #{sessionID}"
 
@@ -51,11 +54,14 @@ class User
 		delete @sockets[socket.id]
 		log.d "#{this}: socket disconnected. Sockets: #{_.keys(@sockets).join ' '}"
 
+	nick: ->
+		@session.nick
+
 	toString: ->
 		"#{@session.nick} [#{@sessionID.substr(0,6)}]"
 
 	info: (msg) ->
-		emit 'info', { msg: msg }
+		@emit 'info', { msg: msg }
 
 	emit: (what, data) ->
 		for id, socket of @sockets
@@ -80,11 +86,19 @@ class User
 			if err
 				log.e "sessionStore.set #{@sessionID} error: #{err}"
 	
-		@emit 'nick', { oldNick: oldNick, newNick: newNick, you: true }
-		# TODO broadcast on user's channels, too
-	
+		@emit 'nick', { oldNick, newNick, you: true }
+		@broadcast 'nick', { oldNick, newNick }
+
+	broadcast: (what, data) ->
+		for id, channel of @channels
+			channel.emit what, data
+
 	join: (channel) ->
-		log "User joining #{channel}"
+		if @channels[channel]
+			return
+		log "User.join #{channel}"
+		@channels[channel] = channel
+		# TODO save channels to session
 
 module.exports.User = User
 

@@ -337,12 +337,13 @@ initSocket = function() {
     var info, newNick, oldNick, you;
     oldNick = _arg.oldNick, newNick = _arg.newNick, you = _arg.you;
     info = {
-      newNick: {
+      nick: {
         oldNick: oldNick,
         newNick: newNick
       }
     };
     if (wasDuplicate(info)) {
+      console.log("duplicate");
       return;
     }
     if (you != null) {

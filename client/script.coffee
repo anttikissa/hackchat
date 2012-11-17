@@ -60,7 +60,6 @@ escapeHtml = (s) ->
 
 ping = ->
 	socket.emit 'ping', ts: new Date().getTime()
-#	socket.send "Hello, I'm sending a message."
 
 newNick = (newNick) ->
 	socket.emit 'nick', newNick: newNick
@@ -245,7 +244,7 @@ initSocket = () ->
 		show "*** pong - roundtrip #{now - backThen} ms"
 
 	socket.on 'nick', ({ oldNick, newNick, you }) ->
-		info = { newNick: { oldNick: oldNick, newNick: newNick } }
+		info = { nick: { oldNick: oldNick, newNick: newNick } }
 		if wasDuplicate(info)
 			return
 
