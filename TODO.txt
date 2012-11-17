@@ -1,6 +1,10 @@
 
 # Items to do
 
+Implement something like "*** zum is on channels: #foo #bar #zot" that is sent
+to client when socket is connected, and have the client update its channel
+status from there.  This will also come as part of a `/whois` result.
+
 Reorganize code.
 
 See what ircII does better when joining a channel. (Listing the participants,
@@ -10,7 +14,7 @@ Topics
 
 Private messages.
 
-"1 people on #foo"
+"1 people on #foo" -> 1 person
 
 /join foo - you're already on that channel!
     Should just add channel to the current connection/socket.
