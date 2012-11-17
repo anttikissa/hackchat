@@ -34,7 +34,7 @@ class Chat
 				@channels[channelName] = new Channel(channelName)
 			channel = @channels[channelName]
 			channel.join user
-			user.join channel, { nosave: true }
+			user.join channel
 			log "*** #{user.nick()} has joined channel #{channel}."
 
 		socket.on 'nick', ({ newNick }) ->
