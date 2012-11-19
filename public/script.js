@@ -1,4 +1,4 @@
-var addChannel, channels, connected, down, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, isCommand, join, leave, list, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, sanitize, say, setChannel, show, socket, up,
+var addChannel, channels, connected, down, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, isCommand, join, leave, list, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, sanitize, say, setChannel, show, socket, up, whois,
   __slice = [].slice,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -112,6 +112,15 @@ names = function(channel) {
   }
 };
 
+whois = function(nick) {
+  if (!nick) {
+    show('*** Please specify nick.');
+  }
+  return socket.emit('whois', {
+    nick: nick
+  });
+};
+
 list = function() {
   return socket.emit('list');
 };
@@ -145,6 +154,7 @@ help = function(help) {
   show("*** /names [<channel>] - show who's on a channel");
   show("*** /next - next channel (shortcut: Ctrl-X)");
   show("*** /prev - previous channel");
+  show("*** /whois [<nick>] - show info about a person");
   show("*** /leave [<channel>] [<message>] - leave a channel (current channel by default)");
   show("*** /help - here we are. Alias: /h");
   show("*** /ping - ping the server.");
@@ -242,7 +252,7 @@ down = function() {
 };
 
 execute = function(cmd) {
-  var args, command, _ref, _ref1, _ref2, _ref3;
+  var args, command, _ref, _ref1, _ref2, _ref3, _ref4;
   if (cmd.match(/^\s*$/)) {
     return;
   }
@@ -268,6 +278,9 @@ execute = function(cmd) {
     case 'names':
     case 'n':
       return names((_ref2 = args[0]) != null ? _ref2 : mychannel);
+    case 'whois':
+    case 'w':
+      return whois((_ref3 = args[0]) != null ? _ref3 : mynick);
     case 'list':
       return list();
     case 'say':
@@ -283,7 +296,7 @@ execute = function(cmd) {
     case 'leave':
     case 'le':
     case 'part':
-      return leave((_ref3 = args[0]) != null ? _ref3 : mychannel, args.slice(1).join(' '));
+      return leave((_ref4 = args[0]) != null ? _ref4 : mychannel, args.slice(1).join(' '));
     case 'next':
       return next();
     case 'prev':
@@ -325,6 +338,19 @@ initSocket = function() {
     backThen = data.ts;
     now = new Date().getTime();
     return show("*** pong - roundtrip " + (now - backThen) + " ms");
+  });
+  socket.on('channels', function(_arg) {
+    var channel, channels, idx, nick, you, _i, _len;
+    nick = _arg.nick, channels = _arg.channels, you = _arg.you;
+    for (idx = _i = 0, _len = channels.length; _i < _len; idx = ++_i) {
+      channel = channels[idx];
+      channels[idx] = '#' + channel;
+    }
+    if (you) {
+      return show("*** You're on channels: " + (channels.join(' ')));
+    } else {
+      return show("*** " + nick + " is on channels: " + (channels.join(' ')));
+    }
   });
   socket.on('nick', function(_arg) {
     var info, newNick, oldNick, you;

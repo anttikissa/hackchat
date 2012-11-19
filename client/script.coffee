@@ -82,6 +82,11 @@ names = (channel) ->
 		channel = sanitize channel
 		socket.emit 'names', channel: channel
 
+whois = (nick) ->
+	if not nick
+		show '*** Please specify nick.'
+	socket.emit 'whois', nick: nick
+
 list = ->
 	socket.emit 'list'
 
@@ -115,7 +120,7 @@ help = (help) ->
 	show "*** /names [<channel>] - show who's on a channel"
 	show "*** /next - next channel (shortcut: Ctrl-X)"
 	show "*** /prev - previous channel"
-#	show "*** /whois [<nick>] - show info about a person"
+	show "*** /whois [<nick>] - show info about a person"
 	show "*** /leave [<channel>] [<message>] - leave a channel (current channel by default)"
 #	show "*** /msg <nick> <message> - send private message to <nick>"
 	show "*** /help - here we are. Alias: /h"
@@ -201,6 +206,7 @@ execute = (cmd) ->
 		when 'ping' then ping()
 		when 'join', 'j' then join args[0]
 		when 'names', 'n' then names (args[0] ? mychannel)
+		when 'whois', 'w' then whois (args[0] ? mynick)
 		when 'list' then list()
 		when 'say', 's' then say mychannel, args
 		when 'help', 'h' then help args
@@ -242,6 +248,14 @@ initSocket = () ->
 		backThen = data.ts
 		now = new Date().getTime()
 		show "*** pong - roundtrip #{now - backThen} ms"
+	
+	socket.on 'channels', ({ nick, channels, you }) ->
+		for channel, idx in channels
+			channels[idx] = '#' + channel
+		if you
+			show "*** You're on channels: #{channels.join ' '}"
+		else
+			show "*** #{nick} is on channels: #{channels.join ' '}"
 
 	socket.on 'nick', ({ oldNick, newNick, you }) ->
 		info = { nick: { oldNick: oldNick, newNick: newNick } }

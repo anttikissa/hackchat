@@ -21,7 +21,11 @@ newNick = () ->
 
 class User
 	# sessionID -> User
-	@users: { }
+	@users: {}
+
+	# nick -> User
+	# TODO this needs to be loaded from redis when starting.
+	@nicks: {}
 
 	# Called from HTTP and WebSocket entry points to make sure that we can
 	# associate sessionID to an User object.
@@ -29,6 +33,7 @@ class User
 		if not @users[sessionID]?
 			user = new User(sessionID, session)
 			@users[sessionID] = user
+			@nicks[user.nick()] = user
 		@users[sessionID]
 
 	constructor: (@sessionID, @session) ->
@@ -60,6 +65,7 @@ class User
 		@sockets[socket.id] = socket
 		log.d "#{this}: connected. Sockets: #{_.keys(@sockets).join ' '}"
 		log.d "TODO Tell socket that we're on channels #{_.keys @channels}"
+		@emit 'channels', channels: @channelList(), you: true
 
 	socketDisconnected: (socket) ->
 		delete @sockets[socket.id]
@@ -72,6 +78,9 @@ class User
 
 	nick: ->
 		@session.nick
+
+	channelList: ->
+		_.keys @channels
 
 	toString: ->
 		"#{@session.nick} [#{@sessionID.substr(0,6)}]"
@@ -86,16 +95,22 @@ class User
 			socket.emit what, data
 
 	# Commands sent by client
+	
+	# Return { oldNick, newNick } if nick change succeeds
 	changeNick: (newNick) ->
 		oldNick = @session.nick
 
 		if newNick == oldNick
-			return @info "You're already known as #{newNick}."
+			@info "You're already known as #{newNick}."
+			return false
 
 		if !validNick newNick
-			return @info "Invalid nick. Must be alphanumeric and at most 15 characters long."
+			@info "Invalid nick. Must be alphanumeric and at most 15 characters long."
+			return false
+
 		if nickTaken newNick
-			return @info "Nick already in use."
+			@info "Nick already in use."
+			return false
 
 		log "*** #{this} is now known as #{newNick}."
 		@session.nick = newNick
@@ -103,6 +118,7 @@ class User
 	
 		@emit 'nick', { oldNick, newNick, you: true }
 		@broadcast 'nick', { oldNick, newNick }
+		return { oldNick, newNick }
 
 	say: (channelName, msg) ->
 		if not channelName

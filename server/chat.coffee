@@ -1,5 +1,6 @@
 { log, s, sanitizeChannel } = require '../lib/utils'
 { Channel } = require './channel'
+{ User } = require './user'
 
 validChannelName = (channel) ->
 	channel = channel.toLowerCase()
@@ -37,8 +38,20 @@ class Chat
 			user.join channel
 			log "*** #{user.nick()} has joined channel #{channel}."
 
-		socket.on 'nick', ({ newNick }) ->
-			user.changeNick(newNick)
+		socket.on 'nick', ({ newNick }) =>
+			result = user.changeNick(newNick)
+			if result
+				{ oldNick, newNick } = result
+				delete User.nicks[oldNick]
+				User.nicks[newNick] = user
+
+		socket.on 'whois', ({ nick }) =>
+			other = User.nicks[nick]
+			if other
+				user.emit 'info', msg: "TODO whois #{nick}"
+				user.emit 'channels', nick: nick, channels: other.channelList()
+			else
+				user.emit 'info', msg: "No such nick #{nick}"
 
 		socket.on 'say', ({ channel, msg }) ->
 			user.say channel, msg
