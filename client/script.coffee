@@ -23,7 +23,7 @@ mychannel = null
 
 addChannel = (channel) ->
 	channels.push channel
-	location.hash = channels.join ','
+#	location.hash = channels.join ','
 	$('.ifchannel').show()
 
 # Remove channel from list, return channel next to it
@@ -31,7 +31,7 @@ removeChannel = (channel) ->
 	idx = channels.indexOf channel
 	if idx != -1
 		channels.splice idx, 1
-	location.hash = channels.join ','
+#	location.hash = channels.join ','
 	if channels.length == 0
 		$('.ifchannel').hide()
 		return null
@@ -39,8 +39,15 @@ removeChannel = (channel) ->
 		return channels[(idx - 1 + channels.length) % channels.length]
 
 setChannel = (next) ->
+	console.log "setChannel #{next}"
 	mychannel = next
-	$('.mychannel').html(if next then '#' + next else '')
+	if next
+		console.log "mychannel is now #{next}"
+		$('.mychannel').html('#' + next)
+		$('.ifchannel').show()
+	else
+		$('.mychannel').html('')
+		$('.ifchannel').hide()
 
 next = () ->
 	if channels.length <= 1 || not mychannel
@@ -256,13 +263,22 @@ initSocket = () ->
 		now = new Date().getTime()
 		show "*** pong - roundtrip #{now - backThen} ms"
 	
-	socket.on 'channels', ({ nick, channels, you }) ->
-		for channel, idx in channels
-			channels[idx] = '#' + channel
-		if you
-			show "*** You're on channels: #{channels.join ' '}"
+	socket.on 'channels', (data) ->
+#		({ nick, channels, you }) ->
+
+		channels = data.channels
+		console.log "#channels is now #{JSON.stringify channels}"
+		if channels.length
+			setChannel channels[0]
+
+		channelNames = []
+		# TODO change global channels to reflect these
+		for channel, idx in data.channels
+			channelNames.push('#' + channel)
+		if data.you
+			show "*** You're on channels: #{channelNames.join ' '}"
 		else
-			show "*** #{nick} is on channels: #{channels.join ' '}"
+			show "*** #{data.nick} is on channels: #{channelNames.join ' '}"
 
 	socket.on 'nick', ({ oldNick, newNick, you }) ->
 		info = { nick: { oldNick: oldNick, newNick: newNick } }
@@ -370,9 +386,9 @@ $ ->
 	initialChannels = (window.location.hash.replace /^#/, '').trim().split ','
 
 	# TODO handling of these
-#	console.log "initials #{JSON.stringify initialChannels}"
-	for c in initialChannels
-		join c if c
+	console.log "initials #{JSON.stringify initialChannels}"
+#	for c in initialChannels
+#		join c if c
 
 	windowHeight = $(window).height()
 
