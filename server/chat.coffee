@@ -38,6 +38,11 @@ class Chat
 			user.join channel
 			log "*** #{user.nick()} has joined channel #{channel}."
 
+		socket.on 'leave', ({ channel }) ->
+			if not channel
+				return user.info "Please specify a channel to leave."
+			channelName = sanitizeChannel channel
+
 		socket.on 'nick', ({ newNick }) =>
 			result = user.changeNick(newNick)
 			if result

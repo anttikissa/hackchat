@@ -1,4 +1,4 @@
-var addChannel, channels, connected, down, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, isCommand, join, leave, list, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, sanitize, say, setChannel, show, socket, up, whois,
+var addChannel, channels, connected, debug, down, emit, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, isCommand, join, leave, list, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, sanitize, say, setChannel, show, socket, up, whois,
   __slice = [].slice,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -70,21 +70,30 @@ escapeHtml = function(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 };
 
+debug = true;
+
+emit = function(what, msg) {
+  if (debug) {
+    show("EMIT " + what + " " + (JSON.stringify(msg)));
+  }
+  return socket.emit(what, msg);
+};
+
 ping = function() {
-  return socket.emit('ping', {
+  return emit('ping', {
     ts: new Date().getTime()
   });
 };
 
 newNick = function(newNick) {
-  return socket.emit('nick', {
+  return emit('nick', {
     newNick: newNick
   });
 };
 
 join = function(channel) {
   channel = sanitize(channel);
-  return socket.emit('join', {
+  return emit('join', {
     channel: channel
   });
 };
@@ -94,7 +103,7 @@ leave = function(channel, message) {
     return show('*** Please specify channel.');
   } else {
     channel = sanitize(channel);
-    return socket.emit('leave', {
+    return emit('leave', {
       channel: channel,
       message: message || "leaving"
     });
@@ -106,7 +115,7 @@ names = function(channel) {
     return show('*** Please specify channel.');
   } else {
     channel = sanitize(channel);
-    return socket.emit('names', {
+    return emit('names', {
       channel: channel
     });
   }
@@ -116,13 +125,13 @@ whois = function(nick) {
   if (!nick) {
     show('*** Please specify nick.');
   }
-  return socket.emit('whois', {
+  return emit('whois', {
     nick: nick
   });
 };
 
 list = function() {
-  return socket.emit('list');
+  return emit('list');
 };
 
 reconnect = function() {
@@ -166,7 +175,7 @@ say = function(channel, msg) {
     return show("*** You're not on a channel - try joining one. /list shows available channels.");
   } else {
     channel = sanitize(channel);
-    return socket.emit('say', {
+    return emit('say', {
       channel: channel,
       msg: msg
     });

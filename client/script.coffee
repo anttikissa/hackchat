@@ -58,37 +58,44 @@ escapeHtml = (s) ->
 	s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 	.replace(/"/g, "&quot;") .replace(/'/g, "&#039;")
 
+debug = true
+
+emit = (what, msg) ->
+	if debug
+		show "EMIT #{what} #{JSON.stringify msg}"
+	socket.emit what, msg
+
 ping = ->
-	socket.emit 'ping', ts: new Date().getTime()
+	emit 'ping', ts: new Date().getTime()
 
 newNick = (newNick) ->
-	socket.emit 'nick', newNick: newNick
+	emit 'nick', newNick: newNick
 
 join = (channel) ->
 	channel = sanitize channel
-	socket.emit 'join', channel: channel
+	emit 'join', channel: channel
 
 leave = (channel, message) ->
 	if not channel
 		show '*** Please specify channel.'
 	else
 		channel = sanitize channel
-		socket.emit 'leave', channel: channel, message: message || "leaving"
+		emit 'leave', channel: channel, message: message || "leaving"
 
 names = (channel) ->
 	if not channel
 		show '*** Please specify channel.'
 	else
 		channel = sanitize channel
-		socket.emit 'names', channel: channel
+		emit 'names', channel: channel
 
 whois = (nick) ->
 	if not nick
 		show '*** Please specify nick.'
-	socket.emit 'whois', nick: nick
+	emit 'whois', nick: nick
 
 list = ->
-	socket.emit 'list'
+	emit 'list'
 
 reconnect = ->
 	if connected
@@ -132,7 +139,7 @@ say = (channel, msg) ->
 		show "*** You're not on a channel - try joining one. /list shows available channels."
 	else
 		channel = sanitize channel
-		socket.emit 'say', channel: channel, msg: msg
+		emit 'say', channel: channel, msg: msg
 
 formatTime = (date) ->
 	hours = String(date.getHours())
