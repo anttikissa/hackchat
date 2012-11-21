@@ -1,49 +1,3 @@
-
-# Feedback
-
-+ Clean design [some people do get it]
-
-+ Great execution of the idea!
-
-+ I also like the URL updating. Makes it easy to share a chat room, and like the
-instructions say, save your chat room favorites.
-
-+ I like the openness of irc, but does it rhave to stay 100% zero-formatted
-text?
-
-+ like the bookmarking
-
-+ with full text search, a simple api and integration w/ github + CI, it could
-be a powerful tool for dev teams
-
-? [felt solid but] no feature that made me go wow, though
-
-+ I like the sheer simplicity
-
-- Could not get /nick to work for me at start however.
-
-- [I like it, but] it would have to be 100% reliable. got a lot of "Failed to
-reconnect" errors
-
-- I was able to see messages of channels that I was not on [might have been
-confusion with which channels he was on]
- 
-? Would like private chats (for a company)
-
-? It would be great if you can make it extensible through being able to hook
-into webservices, such as github, buildsystems, twitter searches, etc. If this
-was possible this would be an environment which I would consider to use
-
-? history / logs would be great
-
-? themes :)
-
-? Would like to join freenode IRC channels
-
-? Mobile? How do keyboard shortcuts work?
-
-
-
 # Items to do
 
 Immediately reconnect when user issues a command.
@@ -86,4 +40,6 @@ Nick collisions
 
 Why is reconnect broken?
     Fixed with a inglorious socket.io hack - get back to this later.
+
+
 
