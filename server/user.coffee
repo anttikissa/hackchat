@@ -131,7 +131,7 @@ class User
 		if not channel
 			return @info "You're not on channel ##{channelName}."
 
-		channel.say this, msg
+		channel.say @nick(), msg
 
 		# TODO where does this belong?
 		log "*** <#{@nick()}:#{channel}> #{msg}"
@@ -148,6 +148,15 @@ class User
 		unless opts?.nosave
 			@session.channels = _.keys @channels
 			@saveSession()
+	
+	leave: (channel) ->
+		channel = @channels[channel.id]
+		if not channel
+			return
+		delete @channels[channel.id]
+
+		@session.channels = _.keys @channels
+		@saveSession()
 
 module.exports.User = User
 

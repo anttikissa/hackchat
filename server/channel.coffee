@@ -8,7 +8,10 @@ class Channel
 		if not @channels[name]
 			@channels[name] = new Channel(name)
 		@channels[name]
-		
+
+	@getIfExists: (name) ->
+		@channels[name]
+
 	constructor: (name) ->
 #		log "Channel(#{name})"
 		@name = name
@@ -21,12 +24,25 @@ class Channel
 		unless opts?.silent
 			@emit 'join', nick: user.nick(), channel: @id
 
-	say: (user, msg) ->
-		@emit 'say', nick: user.nick(), channel: @id, msg: msg
+	leave: (user, message) ->
+		@emit 'leave', {
+			nick: user.nick()
+			channel: @id
+			message: message
+		}
+		delete @users[user.id]
+		# TODO save users of channel to somewhere
+		# TODO if no users on channel, get channel removed
+
+	say: (nick, msg) ->
+#		log "this is #{s this.users}"
+		console.log "say: nick #{nick}"
+		@emit 'say', nick: nick, channel: @id, msg: msg
 
 	emit: (what, data) ->
+#		log "Channel #{this}: emit <#{what}> #{s data}. @users follows"
 		for id, user of @users
-			log "Channel.emit to user #{id} #{what}, #{s data}"
+#			log "Channel.emit to user #{id} #{what}, #{s data}"
 			user.emit what, data
 
 	toString: ->

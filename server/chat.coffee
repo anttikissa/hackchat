@@ -1,3 +1,5 @@
+_ = require 'underscore'
+
 { log, s, sanitizeChannel } = require '../lib/utils'
 { Channel } = require './channel'
 { User } = require './user'
@@ -11,7 +13,7 @@ validChannelName = (channel) ->
 class Chat
 	constructor: () ->
 		# id -> Channel
-		@channels = {}
+#		@channels = {}
 
 	socketConnected: (socket) ->
 		user = socket.user = socket.handshake.user
@@ -31,17 +33,32 @@ class Chat
 			channelName = sanitizeChannel channel
 			if not validChannelName channelName
 				return user.info "Channels must be alphanumeric and at most 25 characters."
-			if not @channels[channelName]
-				@channels[channelName] = new Channel(channelName)
-			channel = @channels[channelName]
+			channel = Channel.get channelName
+#			if not @channels[channelName]
+#				@channels[channelName] = new Channel(channelName)
+#			channel = @channels[channelName]
 			channel.join user
 			user.join channel
 			log "*** #{user.nick()} has joined channel #{channel}."
 
-		socket.on 'leave', ({ channel }) ->
+		leave = (channelName, message) =>
+			log "*** #{user} leaving #{channelName}"
+		
+			channel = Channel.getIfExists channelName
+			if not channel
+				user.info "No such channel #{channelName}"
+			else
+				channel.leave user, message
+				user.leave channel
+
+		socket.on 'leave', ({ channel, message }) ->
 			if not channel
 				return user.info "Please specify a channel to leave."
 			channelName = sanitizeChannel channel
+			if not validChannelName channelName
+				return user.info "Invalid channel name."
+
+			leave channelName, message
 
 		socket.on 'nick', ({ newNick }) =>
 			result = user.changeNick(newNick)

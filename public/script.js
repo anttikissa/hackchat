@@ -24,7 +24,6 @@ mychannel = null;
 
 addChannel = function(channel) {
   channels.push(channel);
-  location.hash = channels.join(',');
   return $('.ifchannel').show();
 };
 
@@ -34,7 +33,6 @@ removeChannel = function(channel) {
   if (idx !== -1) {
     channels.splice(idx, 1);
   }
-  location.hash = channels.join(',');
   if (channels.length === 0) {
     $('.ifchannel').hide();
     return null;
@@ -44,8 +42,16 @@ removeChannel = function(channel) {
 };
 
 setChannel = function(next) {
+  console.log("setChannel " + next);
   mychannel = next;
-  return $('.mychannel').html(next ? '#' + next : '');
+  if (next) {
+    console.log("mychannel is now " + next);
+    $('.mychannel').html('#' + next);
+    return $('.ifchannel').show();
+  } else {
+    $('.mychannel').html('');
+    return $('.ifchannel').hide();
+  }
 };
 
 next = function() {
@@ -348,17 +354,23 @@ initSocket = function() {
     now = new Date().getTime();
     return show("*** pong - roundtrip " + (now - backThen) + " ms");
   });
-  socket.on('channels', function(_arg) {
-    var channel, channels, idx, nick, you, _i, _len;
-    nick = _arg.nick, channels = _arg.channels, you = _arg.you;
-    for (idx = _i = 0, _len = channels.length; _i < _len; idx = ++_i) {
-      channel = channels[idx];
-      channels[idx] = '#' + channel;
+  socket.on('channels', function(data) {
+    var channel, channelNames, idx, _i, _len, _ref;
+    channels = data.channels;
+    console.log("#channels is now " + (JSON.stringify(channels)));
+    if (channels.length) {
+      setChannel(channels[0]);
     }
-    if (you) {
-      return show("*** You're on channels: " + (channels.join(' ')));
+    channelNames = [];
+    _ref = data.channels;
+    for (idx = _i = 0, _len = _ref.length; _i < _len; idx = ++_i) {
+      channel = _ref[idx];
+      channelNames.push('#' + channel);
+    }
+    if (data.you) {
+      return show("*** You're on channels: " + (channelNames.join(' ')));
     } else {
-      return show("*** " + nick + " is on channels: " + (channels.join(' ')));
+      return show("*** " + data.nick + " is on channels: " + (channelNames.join(' ')));
     }
   });
   socket.on('nick', function(_arg) {
@@ -429,7 +441,7 @@ initSocket = function() {
 };
 
 $(function() {
-  var c, clicks, doLayout, focus, initialChannels, timer, windowHeight, _i, _len;
+  var clicks, doLayout, focus, initialChannels, timer, windowHeight;
   mynick = $('.mynick').html();
   initSocket();
   focus = function() {
@@ -493,12 +505,7 @@ $(function() {
     return show("*** That's " + (new Date($(ev.target).attr('datetime'))) + ".");
   });
   initialChannels = (window.location.hash.replace(/^#/, '')).trim().split(',');
-  for (_i = 0, _len = initialChannels.length; _i < _len; _i++) {
-    c = initialChannels[_i];
-    if (c) {
-      join(c);
-    }
-  }
+  console.log("initials " + (JSON.stringify(initialChannels)));
   windowHeight = $(window).height();
   $(window).resize(function() {
     var newHeight;
