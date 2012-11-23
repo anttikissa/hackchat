@@ -1,6 +1,14 @@
-var addChannel, channels, connected, debug, down, emit, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, isCommand, join, leave, list, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, sanitize, say, setChannel, show, socket, up, whois,
+var addChannel, channels, connected, debug, down, emit, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, isCommand, join, leave, list, log, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, s, sanitize, say, setChannel, show, socket, up, whois,
   __slice = [].slice,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+
+log = function() {
+  return console.log.apply(console, arguments);
+};
+
+s = function() {
+  return JSON.stringify.apply(JSON, arguments);
+};
 
 sanitize = function(channel) {
   return channel.replace(/^#+/, '');
@@ -45,7 +53,6 @@ setChannel = function(next) {
   console.log("setChannel " + next);
   mychannel = next;
   if (next) {
-    console.log("mychannel is now " + next);
     $('.mychannel').html('#' + next);
     return $('.ifchannel').show();
   } else {
@@ -80,7 +87,7 @@ debug = true;
 
 emit = function(what, msg) {
   if (debug) {
-    show("EMIT " + what + " " + (JSON.stringify(msg)));
+    show("=> '" + what + "': " + (JSON.stringify(msg)));
   }
   return socket.emit(what, msg);
 };
@@ -322,122 +329,142 @@ execute = function(cmd) {
 };
 
 initSocket = function() {
-  var previousInfo, wasDuplicate;
-  previousInfo = null;
-  wasDuplicate = function(info) {
-    if (JSON.stringify(previousInfo) === JSON.stringify(info)) {
-      return true;
-    } else {
-      previousInfo = info;
-      return false;
+  var action, protocol, what, _results;
+  protocol = {
+    disconnect: function() {
+      show("*** Disconnected from server.");
+      return connected = false;
+    },
+    connect: function() {
+      show("*** Connected to server.");
+      connected = true;
+      return ping();
+    },
+    names: function(_arg) {
+      var channel, names;
+      channel = _arg.channel, names = _arg.names;
+      names.sort();
+      show("*** There are " + names.length + " people on #" + channel + ":");
+      return show("*** " + (names.join(' ')));
+    },
+    pong: function(data) {
+      var backThen, now;
+      backThen = data.ts;
+      now = new Date().getTime();
+      return show("*** pong - roundtrip " + (now - backThen) + " ms");
+    },
+    channels: function(data) {
+      var channel, channelNames, idx, _i, _len, _ref;
+      channelNames = [];
+      _ref = data.channels;
+      for (idx = _i = 0, _len = _ref.length; _i < _len; idx = ++_i) {
+        channel = _ref[idx];
+        channelNames.push('#' + channel);
+      }
+      if (data.you) {
+        channels = data.channels;
+        if (channels.length) {
+          setChannel(channels[0]);
+        }
+        return show("*** You're on channels: " + (channelNames.join(' ')));
+      } else {
+        return show("*** " + data.nick + " is on channels: " + (channelNames.join(' ')));
+      }
+    },
+    nick: function(_arg) {
+      var info, newNick, oldNick, you;
+      oldNick = _arg.oldNick, newNick = _arg.newNick, you = _arg.you;
+      info = {
+        nick: {
+          oldNick: oldNick,
+          newNick: newNick
+        }
+      };
+      if (wasDuplicate(info)) {
+        return;
+      }
+      if (you != null) {
+        show("*** You are now known as " + newNick + ".");
+        mynick = newNick;
+        return $('.mynick').html(newNick);
+      } else {
+        return show("*** " + oldNick + " is now known as " + newNick + ".");
+      }
+    },
+    error: function(data) {
+      return show("*** Failed to reconnect. Please try again later.");
+    },
+    info: function(_arg) {
+      var msg;
+      msg = _arg.msg;
+      return show("*** " + msg);
+    },
+    msg: function(_arg) {
+      var from, msg;
+      from = _arg.from, msg = _arg.msg;
+      return show("<" + from + "> " + msg);
+    },
+    join: function(_arg) {
+      var channel, nick, tellUser;
+      nick = _arg.nick, channel = _arg.channel;
+      tellUser = true;
+      if (nick === mynick) {
+        setChannel(channel);
+        if (__indexOf.call(channels, channel) >= 0) {
+          tellUser = false;
+        } else {
+          addChannel(channel);
+        }
+      }
+      if (tellUser) {
+        return show("*** " + nick + " has joined channel #" + channel + ".");
+      }
+    },
+    leave: function(_arg) {
+      var channel, message, nextChannel, nick;
+      nick = _arg.nick, channel = _arg.channel, message = _arg.message;
+      show("*** " + nick + " has left channel #" + channel + " (" + message + ").");
+      if (nick === mynick) {
+        nextChannel = removeChannel(channel);
+        if (mychannel === channel) {
+          return setChannel(nextChannel);
+        }
+      }
+    },
+    say: function(_arg) {
+      var channel, msg, nick, previousInfo, wasDuplicate;
+      nick = _arg.nick, channel = _arg.channel, msg = _arg.msg;
+      show("<" + nick + ":#" + channel + "> " + msg);
+      previousInfo = null;
+      return wasDuplicate = function(info) {
+        if (JSON.stringify(previousInfo) === JSON.stringify(info)) {
+          return true;
+        } else {
+          previousInfo = info;
+          return false;
+        }
+      };
     }
   };
-  socket.on('disconnect', function() {
-    show("*** Disconnected from server.");
-    return connected = false;
-  });
-  socket.on('connect', function() {
-    show("*** Connected to server.");
-    connected = true;
-    return ping();
-  });
-  socket.on('names', function(_arg) {
-    var channel, names;
-    channel = _arg.channel, names = _arg.names;
-    names.sort();
-    show("*** There are " + names.length + " people on #" + channel + ":");
-    return show("*** " + (names.join(' ')));
-  });
-  socket.on('pong', function(data) {
-    var backThen, now;
-    backThen = data.ts;
-    now = new Date().getTime();
-    return show("*** pong - roundtrip " + (now - backThen) + " ms");
-  });
-  socket.on('channels', function(data) {
-    var channel, channelNames, idx, _i, _len, _ref;
-    channels = data.channels;
-    console.log("#channels is now " + (JSON.stringify(channels)));
-    if (channels.length) {
-      setChannel(channels[0]);
-    }
-    channelNames = [];
-    _ref = data.channels;
-    for (idx = _i = 0, _len = _ref.length; _i < _len; idx = ++_i) {
-      channel = _ref[idx];
-      channelNames.push('#' + channel);
-    }
-    if (data.you) {
-      return show("*** You're on channels: " + (channelNames.join(' ')));
-    } else {
-      return show("*** " + data.nick + " is on channels: " + (channelNames.join(' ')));
-    }
-  });
-  socket.on('nick', function(_arg) {
-    var info, newNick, oldNick, you;
-    oldNick = _arg.oldNick, newNick = _arg.newNick, you = _arg.you;
-    info = {
-      nick: {
-        oldNick: oldNick,
-        newNick: newNick
-      }
-    };
-    if (wasDuplicate(info)) {
-      return;
-    }
-    if (you != null) {
-      show("*** You are now known as " + newNick + ".");
-      mynick = newNick;
-      return $('.mynick').html(newNick);
-    } else {
-      return show("*** " + oldNick + " is now known as " + newNick + ".");
-    }
-  });
-  socket.on('error', function(data) {
-    return show("*** Failed to reconnect. Please try again later.");
-  });
-  socket.on('info', function(_arg) {
-    var msg;
-    msg = _arg.msg;
-    return show("*** " + msg);
-  });
-  socket.on('msg', function(_arg) {
-    var from, msg;
-    from = _arg.from, msg = _arg.msg;
-    return show("<" + from + "> " + msg);
-  });
-  socket.on('join', function(_arg) {
-    var channel, nick, tellUser;
-    nick = _arg.nick, channel = _arg.channel;
-    tellUser = true;
-    if (nick === mynick) {
-      setChannel(channel);
-      if (__indexOf.call(channels, channel) >= 0) {
-        tellUser = false;
-      } else {
-        addChannel(channel);
-      }
-    }
-    if (tellUser) {
-      return show("*** " + nick + " has joined channel #" + channel + ".");
-    }
-  });
-  socket.on('leave', function(_arg) {
-    var channel, message, nextChannel, nick;
-    nick = _arg.nick, channel = _arg.channel, message = _arg.message;
-    show("*** " + nick + " has left channel #" + channel + " (" + message + ").");
-    if (nick === mynick) {
-      nextChannel = removeChannel(channel);
-      if (mychannel === channel) {
-        return setChannel(nextChannel);
-      }
-    }
-  });
-  return socket.on('say', function(_arg) {
-    var channel, msg, nick;
-    nick = _arg.nick, channel = _arg.channel, msg = _arg.msg;
-    return show("<" + nick + ":#" + channel + "> " + msg);
-  });
+  _results = [];
+  for (what in protocol) {
+    action = protocol[what];
+    _results.push((function(what, action) {
+      log("Listening to " + what + " with " + action);
+      return socket.on(what, function(data) {
+        log("Got command " + what);
+        if (debug) {
+          if (data != null) {
+            show("<= '" + what + "': " + (s(data)));
+          } else {
+            show("<= '" + what + "'");
+          }
+        }
+        return action(data);
+      });
+    })(what, action));
+  }
+  return _results;
 };
 
 $(function() {

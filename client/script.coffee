@@ -1,5 +1,8 @@
 # Utilities
 
+log = -> console.log arguments...
+s = -> JSON.stringify arguments...
+
 # Remove any number of #'s from the beginning of the channel name.
 sanitize = (channel) ->
 	channel.replace /^#+/, ''
@@ -42,7 +45,7 @@ setChannel = (next) ->
 	console.log "setChannel #{next}"
 	mychannel = next
 	if next
-		console.log "mychannel is now #{next}"
+#		console.log "mychannel is now #{next}"
 		$('.mychannel').html('#' + next)
 		$('.ifchannel').show()
 	else
@@ -69,7 +72,7 @@ debug = true
 
 emit = (what, msg) ->
 	if debug
-		show "EMIT #{what} #{JSON.stringify msg}"
+		show "=> '#{what}': #{JSON.stringify msg}"
 	socket.emit what, msg
 
 ping = ->
@@ -231,102 +234,105 @@ execute = (cmd) ->
 		else show "*** I don't know that command: #{command}."
 
 initSocket = () ->
-	# Some infos may be sent multiple times (for every channel you are on).
-	# Ignore them. Should be done on the server side.
-	previousInfo = null
-	wasDuplicate = (info) ->
-		if JSON.stringify(previousInfo) == JSON.stringify(info)
-#			console.log "### Ignoring duplicate info #{JSON.stringify info}"
-			true
-		else
-			previousInfo = info
-			false
+	protocol =
+		disconnect: ->
+			show "*** Disconnected from server."
+			connected = false
 
-	socket.on 'disconnect', ->
-		show "*** Disconnected from server."
-		connected = false
+		connect: ->
+			show "*** Connected to server."
+			connected = true
+			ping()
 
-	socket.on 'connect', ->
-		show "*** Connected to server."
-		connected = true
-		ping()
-#		for channel in channels
-#			join channel
+		names: ({ channel, names }) ->
+			names.sort()
+			show "*** There are #{names.length} people on ##{channel}:"
+			show "*** #{names.join ' '}"
 
-	socket.on 'names', ({ channel, names }) ->
-		names.sort()
-		show "*** There are #{names.length} people on ##{channel}:"
-		show "*** #{names.join ' '}"
-		
-	socket.on 'pong', (data) ->
-		backThen = data.ts
-		now = new Date().getTime()
-		show "*** pong - roundtrip #{now - backThen} ms"
-	
-	socket.on 'channels', (data) ->
-#		({ nick, channels, you }) ->
+		pong: (data) ->
+			backThen = data.ts
+			now = new Date().getTime()
+			show "*** pong - roundtrip #{now - backThen} ms"
 
-		channels = data.channels
-		console.log "#channels is now #{JSON.stringify channels}"
-		if channels.length
-			setChannel channels[0]
-
-		channelNames = []
-		# TODO change global channels to reflect these
-		for channel, idx in data.channels
-			channelNames.push('#' + channel)
-		if data.you
-			show "*** You're on channels: #{channelNames.join ' '}"
-		else
-			show "*** #{data.nick} is on channels: #{channelNames.join ' '}"
-
-	socket.on 'nick', ({ oldNick, newNick, you }) ->
-		info = { nick: { oldNick: oldNick, newNick: newNick } }
-		if wasDuplicate(info)
-			return
-
-		if you?
-			show "*** You are now known as #{newNick}."
-			mynick = newNick
-			$('.mynick').html(newNick)
-		else
-			show "*** #{oldNick} is now known as #{newNick}."
-
-	socket.on 'error', (data) ->
-		show "*** Failed to reconnect. Please try again later."
-		# simply ignore it.
-#		show "*** socket.io error: #{JSON.stringify data}"
-
-	socket.on 'info', ({ msg }) ->
-		show "*** #{msg}"
-
-	socket.on 'msg', ({ from, msg }) ->
-		show "<#{from}> #{msg}"
-
-	socket.on 'join', ({ nick, channel }) ->
-#		show "Join #{nick} #{channel}"
-		tellUser = true
-		if nick == mynick
-			setChannel(channel)
-			if channel in channels
-				tellUser = false
+		channels: (data) ->
+			channelNames = []
+			for channel, idx in data.channels
+				channelNames.push('#' + channel)
+			if data.you
+				channels = data.channels
+				if channels.length
+					setChannel channels[0]
+				show "*** You're on channels: #{channelNames.join ' '}"
 			else
-				addChannel channel
-#				show "*** channels this socket is on: #{channels.join ' '}"
+				show "*** #{data.nick} is on channels: #{channelNames.join ' '}"
 
-		if tellUser
-			show "*** #{nick} has joined channel ##{channel}."
+		nick: ({ oldNick, newNick, you }) ->
+			info = { nick: { oldNick: oldNick, newNick: newNick } }
+			if wasDuplicate(info)
+				return
 
-	socket.on 'leave', ({ nick, channel, message }) ->
-		show "*** #{nick} has left channel ##{channel} (#{message})."
+			if you?
+				show "*** You are now known as #{newNick}."
+				mynick = newNick
+				$('.mynick').html(newNick)
+			else
+				show "*** #{oldNick} is now known as #{newNick}."
 
-		if nick == mynick
-			nextChannel = removeChannel channel
-			if mychannel == channel
-				setChannel(nextChannel)
+		error: (data) ->
+			show "*** Failed to reconnect. Please try again later."
 
-	socket.on 'say', ({ nick, channel, msg }) ->
-		show "<#{nick}:##{channel}> #{msg}"
+		info: ({ msg }) ->
+			show "*** #{msg}"
+
+		msg: ({ from, msg }) ->
+			show "<#{from}> #{msg}"
+
+		join: ({ nick, channel }) ->
+			tellUser = true
+			if nick == mynick
+				setChannel(channel)
+				if channel in channels
+					tellUser = false
+				else
+					addChannel channel
+
+			if tellUser
+				show "*** #{nick} has joined channel ##{channel}."
+
+		leave: ({ nick, channel, message }) ->
+			show "*** #{nick} has left channel ##{channel} (#{message})."
+
+			if nick == mynick
+				nextChannel = removeChannel channel
+				if mychannel == channel
+					setChannel(nextChannel)
+
+		say: ({ nick, channel, msg }) ->
+			show "<#{nick}:##{channel}> #{msg}"
+			# Some infos may be sent multiple times (for every channel you are on).
+			# Ignore them. Should be done on the server side.
+			previousInfo = null
+			wasDuplicate = (info) ->
+				if JSON.stringify(previousInfo) == JSON.stringify(info)
+					#console.log "### Ignoring duplicate info #{JSON.stringify info}"
+					true
+				else
+					previousInfo = info
+					false
+
+	for what, action of protocol
+		do (what, action) ->
+			log "Listening to #{what} with #{action}"
+			socket.on what, (data) ->
+				log "Got command #{what}"
+				if debug
+					if data?
+						show "<= '#{what}': #{s data}"
+					else
+						show "<= '#{what}'"
+				action data
+
+	
 
 $ ->
 	mynick = $('.mynick').html()

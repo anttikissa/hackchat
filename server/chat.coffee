@@ -51,6 +51,9 @@ class Chat
 				channel.leave user, message
 				user.leave channel
 
+		socket.on 'names', ({ channel }) ->
+			user.info "TODO names #{channel}"
+
 		socket.on 'leave', ({ channel, message }) ->
 			if not channel
 				return user.info "Please specify a channel to leave."
