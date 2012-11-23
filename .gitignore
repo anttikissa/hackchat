@@ -2,3 +2,4 @@ node_modules
 .*.swp
 access.log
 logs
+dump.rdb
