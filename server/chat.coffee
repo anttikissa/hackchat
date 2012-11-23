@@ -12,8 +12,6 @@ validChannelName = (channel) ->
 
 class Chat
 	constructor: () ->
-		# id -> Channel
-#		@channels = {}
 
 	socketConnected: (socket) ->
 		user = socket.user = socket.handshake.user
@@ -34,9 +32,6 @@ class Chat
 			if not validChannelName channelName
 				return user.info "Channels must be alphanumeric and at most 25 characters."
 			channel = Channel.get channelName
-#			if not @channels[channelName]
-#				@channels[channelName] = new Channel(channelName)
-#			channel = @channels[channelName]
 			channel.join user
 			user.join channel
 			log "*** #{user.nick()} has joined channel #{channel}."

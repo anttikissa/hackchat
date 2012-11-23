@@ -235,6 +235,16 @@ execute = (cmd) ->
 		else show "*** I don't know that command: #{command}."
 
 initSocket = () ->
+	previousInfo = null
+
+	wasDuplicate = (info) ->
+		if JSON.stringify(previousInfo) == JSON.stringify(info)
+			#console.log "### Ignoring duplicate info #{JSON.stringify info}"
+			true
+		else
+			previousInfo = info
+			false
+
 	protocol =
 		disconnect: ->
 			show "*** Disconnected from server."
@@ -272,7 +282,7 @@ initSocket = () ->
 			if wasDuplicate(info)
 				return
 
-			if you?
+			if you
 				show "*** You are now known as #{newNick}."
 				mynick = newNick
 				$('.mynick').html(newNick)
@@ -310,16 +320,6 @@ initSocket = () ->
 
 		say: ({ nick, channel, msg }) ->
 			show "<#{nick}:##{channel}> #{msg}"
-			# Some infos may be sent multiple times (for every channel you are on).
-			# Ignore them. Should be done on the server side.
-			previousInfo = null
-			wasDuplicate = (info) ->
-				if JSON.stringify(previousInfo) == JSON.stringify(info)
-					#console.log "### Ignoring duplicate info #{JSON.stringify info}"
-					true
-				else
-					previousInfo = info
-					false
 
 	for what, action of protocol
 		do (what, action) ->

@@ -330,7 +330,16 @@ execute = function(cmd) {
 };
 
 initSocket = function() {
-  var action, protocol, what, _results;
+  var action, previousInfo, protocol, wasDuplicate, what, _results;
+  previousInfo = null;
+  wasDuplicate = function(info) {
+    if (JSON.stringify(previousInfo) === JSON.stringify(info)) {
+      return true;
+    } else {
+      previousInfo = info;
+      return false;
+    }
+  };
   protocol = {
     disconnect: function() {
       show("*** Disconnected from server.");
@@ -375,6 +384,7 @@ initSocket = function() {
     nick: function(_arg) {
       var info, newNick, oldNick, you;
       oldNick = _arg.oldNick, newNick = _arg.newNick, you = _arg.you;
+      log("GRRRR! NICK GOTTEN " + newNick);
       info = {
         nick: {
           oldNick: oldNick,
@@ -384,6 +394,7 @@ initSocket = function() {
       if (wasDuplicate(info)) {
         return;
       }
+      log("GRRRR! CHANGEY NICK ELLER");
       if (you != null) {
         show("*** You are now known as " + newNick + ".");
         mynick = newNick;
@@ -433,18 +444,9 @@ initSocket = function() {
       }
     },
     say: function(_arg) {
-      var channel, msg, nick, previousInfo, wasDuplicate;
+      var channel, msg, nick;
       nick = _arg.nick, channel = _arg.channel, msg = _arg.msg;
-      show("<" + nick + ":#" + channel + "> " + msg);
-      previousInfo = null;
-      return wasDuplicate = function(info) {
-        if (JSON.stringify(previousInfo) === JSON.stringify(info)) {
-          return true;
-        } else {
-          previousInfo = info;
-          return false;
-        }
-      };
+      return show("<" + nick + ":#" + channel + "> " + msg);
     }
   };
   _results = [];

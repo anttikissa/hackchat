@@ -21,11 +21,11 @@ newNick = () ->
 
 class User
 	# sessionID -> User
-	@users: {}
+	@users: Object.create null
 
 	# nick -> User
 	# TODO this needs to be loaded from redis when starting.
-	@nicks: {}
+	@nicks: Object.create null
 
 	# Called from HTTP and WebSocket entry points to make sure that we can
 	# associate sessionID to an User object.
@@ -39,8 +39,9 @@ class User
 	constructor: (@sessionID, @session) ->
 		@id = @sessionID
 		# socket id -> socket
-		@sockets = {}
-		@channels = {}
+		@sockets = Object.create null
+		# channel id -> Channel
+		@channels = Object.create null
 
 		log "session is #{s @session}"
 		if not @session.nick?

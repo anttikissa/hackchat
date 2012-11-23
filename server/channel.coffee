@@ -1,7 +1,7 @@
 { log, s } = require '../lib/utils'
 
 class Channel
-	@channels: {}
+	@channels: Object.create null
 
 	# Assume valid name
 	@get: (name) ->
