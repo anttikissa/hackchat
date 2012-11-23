@@ -142,6 +142,7 @@ help = (help) ->
 #	show "*** /msg <nick> <message> - send private message to <nick>"
 	show "*** /help - here we are. Alias: /h"
 	show "*** /ping - ping the server."
+	show "*** /set - set a variables."
 	show "*** /reconnect - try to connect to the server if we're not connected."
 
 say = (channel, msg) ->

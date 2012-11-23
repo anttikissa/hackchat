@@ -180,6 +180,7 @@ help = function(help) {
   show("*** /leave [<channel>] [<message>] - leave a channel (current channel by default)");
   show("*** /help - here we are. Alias: /h");
   show("*** /ping - ping the server.");
+  show("*** /set - set a variables.");
   return show("*** /reconnect - try to connect to the server if we're not connected.");
 };
 
