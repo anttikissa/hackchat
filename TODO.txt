@@ -1,7 +1,15 @@
 # Items to do
 
+Implement more graceful server reconnecting.
+    Server should hold onto old connections while the new server is starting.
+    Then, when the new one is ready to accept connections, it should stop
+    listening, tell the new server to start listening, and inform its clients to
+    reconnect.
+
+    This likely requires some child process magic.
+
 Reimplement old stuff.
-    /leave
+    /names
     ... what else?
 
 Immediately reconnect when user issues a command.
@@ -24,6 +32,10 @@ how does it look?)
 Topics
 
 Private messages.
+
+More informative help. With links that do /help say (e.g.) automatically.
+
+Clicking on channel should show info about channel.
 
 "1 people on #foo" -> 1 person
 
