@@ -384,7 +384,6 @@ initSocket = function() {
     nick: function(_arg) {
       var info, newNick, oldNick, you;
       oldNick = _arg.oldNick, newNick = _arg.newNick, you = _arg.you;
-      log("GRRRR! NICK GOTTEN " + newNick);
       info = {
         nick: {
           oldNick: oldNick,
@@ -394,8 +393,7 @@ initSocket = function() {
       if (wasDuplicate(info)) {
         return;
       }
-      log("GRRRR! CHANGEY NICK ELLER");
-      if (you != null) {
+      if (you) {
         show("*** You are now known as " + newNick + ".");
         mynick = newNick;
         return $('.mynick').html(newNick);
