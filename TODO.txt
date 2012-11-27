@@ -1,5 +1,8 @@
 # Items to do
 
+Handle redis downtime more gracefully (now session is just undefined in the
+session interceptor).
+
 Implement more graceful server reconnecting.
     Server should hold onto old connections while the new server is starting.
     Then, when the new one is ready to accept connections, it should stop

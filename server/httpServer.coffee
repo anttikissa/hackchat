@@ -7,7 +7,7 @@ parseSignedCookie = require('connect/lib/utils').parseSignedCookie
 _ = require 'underscore'
 fs = require 'fs'
 
-{ log } = require '../lib/utils'
+{ log, s } = require '../lib/utils'
 { Chat } = require './chat'
 { User } = require './user'
 
@@ -63,6 +63,8 @@ run = ->
 			resp.send 'Fail', 404
 
 	app.use (req, resp, next) ->
+		if not req.session
+			throw new Error("session is null, likely because redis down!")
 		User.getOrInitUser(req.sessionID, req.session)
 		next()
 

@@ -39,7 +39,7 @@ class Chat
 		leave = (channelName, message) =>
 			log "*** #{user} leaving #{channelName}"
 		
-			channel = Channel.getIfExists channelName
+			channel = Channel.getIfExists sanitize channelName
 			if not channel
 				user.info "No such channel #{channelName}"
 			else
@@ -47,7 +47,16 @@ class Chat
 				user.leave channel
 
 		socket.on 'names', ({ channel }) ->
-			user.info "TODO names #{channel}"
+			channelName = sanitizeChannel channel
+			channel = Channel.getIfExists channelName
+
+			if channel
+				user.emit 'names', {
+					channel: channelName
+					names: user.nick() for userId, user of channel.users
+				}
+			else
+				user.info "No such channel #{channelName}"
 
 		socket.on 'leave', ({ channel, message }) ->
 			if not channel
