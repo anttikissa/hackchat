@@ -12,8 +12,9 @@ Implement more graceful server reconnecting.
     This likely requires some child process magic.
 
 Reimplement old stuff.
-    /names
     ... what else?
+
+Make channels work so that localhost/#foo,bar works again.
 
 Immediately reconnect when user issues a command.
     socket.io magic?
