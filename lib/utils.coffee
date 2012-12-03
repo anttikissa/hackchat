@@ -14,7 +14,7 @@ log.d = (msg) ->
 
 log.e = (msg) ->
 	msg ?= ''
-	console.err "#{time()}[ERROR] #{msg}"
+	console.error "#{time()}[ERROR] #{msg}"
 
 s = -> JSON.stringify arguments...
 
