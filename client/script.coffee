@@ -42,7 +42,7 @@ removeChannel = (channel) ->
 		return channels[(idx - 1 + channels.length) % channels.length]
 
 setChannel = (next) ->
-	console.log "setChannel #{next}"
+#	console.log "setChannel #{next}"
 	mychannel = next
 	if next
 #		console.log "mychannel is now #{next}"
@@ -68,7 +68,7 @@ escapeHtml = (s) ->
 	s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 	.replace(/"/g, "&quot;") .replace(/'/g, "&#039;")
 
-debug = true
+debug = false
 
 emit = (what, msg) ->
 	if debug
@@ -221,7 +221,7 @@ execute = (cmd) ->
 
 	switch command
 		when 'nick' then newNick args[0]
-		when 'ping' then ping()
+		when 'ping' then if debug then ping()
 		when 'join', 'j' then join args[0]
 		when 'names', 'n' then names (args[0] ? mychannel)
 		when 'whois', 'w' then whois (args[0] ? mynick)
@@ -323,9 +323,9 @@ initSocket = () ->
 
 	for what, action of protocol
 		do (what, action) ->
-			log "Listening to #{what} with #{action}"
+#			log "Listening to #{what} with #{action}"
 			socket.on what, (data) ->
-				log "Got command #{what}"
+#				log "Got command #{what}"
 				if debug
 					if data?
 						show "<= '#{what}': #{s data}"

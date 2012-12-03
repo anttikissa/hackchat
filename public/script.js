@@ -50,7 +50,6 @@ removeChannel = function(channel) {
 };
 
 setChannel = function(next) {
-  console.log("setChannel " + next);
   mychannel = next;
   if (next) {
     $('.mychannel').html('#' + next);
@@ -83,7 +82,7 @@ escapeHtml = function(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 };
 
-debug = true;
+debug = false;
 
 emit = function(what, msg) {
   if (debug) {
@@ -294,7 +293,10 @@ execute = function(cmd) {
     case 'nick':
       return newNick(args[0]);
     case 'ping':
-      return ping();
+      if (debug) {
+        return ping();
+      }
+      break;
     case 'join':
     case 'j':
       return join(args[0]);
@@ -451,9 +453,7 @@ initSocket = function() {
   for (what in protocol) {
     action = protocol[what];
     _results.push((function(what, action) {
-      log("Listening to " + what + " with " + action);
       return socket.on(what, function(data) {
-        log("Got command " + what);
         if (debug) {
           if (data != null) {
             show("<= '" + what + "': " + (s(data)));
