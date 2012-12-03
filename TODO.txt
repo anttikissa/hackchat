@@ -19,6 +19,8 @@ Make channels work so that localhost/#foo,bar works again.
 Immediately reconnect when user issues a command.
     socket.io magic?
 
+Multi-argument /join and /leave (possibly)
+
 Make sure that messages directed to an user are sent even though the user is
 disconnected for some reason.  Have User have a queue of unsent messages (which
 are then, discarded, if they pile up uncollected?)?
@@ -36,6 +38,8 @@ how does it look?)
 Topics
 
 Private messages.
+
+/msg to work the same as /say.
 
 More informative help. With links that do /help say (e.g.) automatically.
 
