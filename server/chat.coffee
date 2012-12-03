@@ -21,7 +21,7 @@ class Chat
 		leave = (channelName, message) =>
 			log "*** #{user} leaving #{channelName}"
 		
-			channel = Channel.getIfExists sanitize channelName
+			channel = Channel.getIfExists sanitizeChannel channelName
 			if not channel
 				user.info "No such channel #{channelName}"
 			else
