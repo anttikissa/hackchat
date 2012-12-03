@@ -15,6 +15,9 @@ socket = io.connect()
 # List of all channels this socket is on.
 channels = []
 
+# List of all channels this user is on.
+allChannels = []
+
 # Command history.
 history = []
 historyIdx = 0
@@ -26,7 +29,7 @@ mychannel = null
 
 addChannel = (channel) ->
 	channels.push channel
-#	location.hash = channels.join ','
+	location.hash = channels.join ','
 	$('.ifchannel').show()
 
 # Remove channel from list, return channel next to it
@@ -34,7 +37,7 @@ removeChannel = (channel) ->
 	idx = channels.indexOf channel
 	if idx != -1
 		channels.splice idx, 1
-#	location.hash = channels.join ','
+	location.hash = channels.join ','
 	if channels.length == 0
 		$('.ifchannel').hide()
 		return null
@@ -84,6 +87,10 @@ newNick = (newNick) ->
 join = (channel) ->
 	channel = sanitize channel
 	emit 'join', channel: channel
+
+listen = (channel) ->
+	channel = sanitize channel
+	emit 'listen', channel: channel
 
 leave = (channel, message) ->
 	if not channel
@@ -223,6 +230,7 @@ execute = (cmd) ->
 		when 'nick' then newNick args[0]
 		when 'ping' then ping()
 		when 'join', 'j' then join args[0]
+		when 'listen' then listen args[0]
 		when 'names', 'n' then names (args[0] ? mychannel)
 		when 'whois', 'w' then whois (args[0] ? mynick)
 		when 'list' then list()
@@ -232,6 +240,7 @@ execute = (cmd) ->
 		when 'leave', 'le', 'part' then leave(args[0] ? mychannel, args[1..].join ' ')
 		when 'next' then next()
 		when 'prev' then prev()
+		when 'raw' then emit args[0], JSON.parse(args[1..].join(' '))
 		else show "*** I don't know that command: #{command}."
 
 initSocket = () ->
@@ -272,6 +281,8 @@ initSocket = () ->
 				channelNames.push('#' + channel)
 			if data.you
 				channels = data.channels
+				# Do it something like this
+#				allChannels = data.channels
 				if channels.length
 					setChannel channels[0]
 					show "*** You're on channels: #{channelNames.join ' '}"
@@ -395,10 +406,10 @@ $ ->
 
 	initialChannels = (window.location.hash.replace /^#/, '').trim().split ','
 
-	# TODO handling of these
+	# TODO handling of these if no channels to listen
 	console.log "initials #{JSON.stringify initialChannels}"
-#	for c in initialChannels
-#		join c if c
+	for c in initialChannels
+		listen c if c
 
 	windowHeight = $(window).height()
 

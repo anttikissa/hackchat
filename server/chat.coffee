@@ -49,6 +49,15 @@ class Chat
 				user.join channel
 				log "*** #{user.nick()} has joined channel #{channel}."
 
+			listen: ({ channel }) =>
+				if not channel
+					return user.info "Please specify a channel to listen."
+				channelName = sanitizeChannel channel
+				if not validChannelName channelName
+					return user.info "Channels must be alphanumeric and at most 25 characters."
+				channel = Channel.get channelName
+				channel.listen user, socket.id
+
 			names: ({ channel }) ->
 				channelName = sanitizeChannel channel
 				channel = Channel.getIfExists channelName

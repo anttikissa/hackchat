@@ -16,7 +16,11 @@ class Channel
 #		log "Channel(#{name})"
 		@name = name
 		@id = name
-		@users = {}
+		@users = Object.create null
+		# Those sockets who want to receive channel messages.
+		# @emit() will distributes messages to them.
+		# Map of socket ids to user objects.
+		@listeners = Object.create null
 
 	join: (user, opts) ->
 #		log "Channel.join #{user}, this #{this}"
@@ -27,6 +31,20 @@ class Channel
 		else
 			unless opts?.silent
 				@emit 'join', nick: user.nick(), channel: @id
+
+	listen: (user, socketId) ->
+		@listeners[socketId] = user
+
+		if @users[user.id]
+			# Should really emitToSocket to that socket!
+			user.info "Now listening to channel #{this}."
+		else
+			user.info "You're not on channel #{this}, cannot listen."
+			#{user.id} not on channel #{this}, yet is trying to listen to it! Should not happen!"
+			# TODO or just complain to the user directly.
+
+	unlisten: (socketId) ->
+		delete @listeners[socketId]
 
 	leave: (user, message) ->
 		@emit 'leave', {
@@ -44,10 +62,12 @@ class Channel
 		@emit 'say', nick: nick, channel: @id, msg: msg
 
 	emit: (what, data) ->
-#		log "Channel #{this}: emit <#{what}> #{s data}. @users follows"
-		for id, user of @users
-#			log "Channel.emit to user #{id} #{what}, #{s data}"
-			user.emit what, data
+		log "Channel #{this} broadcasting #{what} to listening sockets."
+		for socketId, user of @listeners
+			log "Listener #{socketId}, user #{user}"
+			user.emitToSocket socketId, what, data
+		# for id, user of @users
+		#	user.emit what, data
 
 	toString: ->
 		"#" + @id

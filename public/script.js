@@ -1,4 +1,4 @@
-var addChannel, channels, connected, debug, down, emit, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, isCommand, join, leave, list, log, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, s, sanitize, say, setChannel, show, socket, up, whois,
+var addChannel, allChannels, channels, connected, debug, down, emit, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, isCommand, join, leave, list, listen, log, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, s, sanitize, say, setChannel, show, socket, up, whois,
   __slice = [].slice,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -20,6 +20,8 @@ socket = io.connect();
 
 channels = [];
 
+allChannels = [];
+
 history = [];
 
 historyIdx = 0;
@@ -32,6 +34,7 @@ mychannel = null;
 
 addChannel = function(channel) {
   channels.push(channel);
+  location.hash = channels.join(',');
   return $('.ifchannel').show();
 };
 
@@ -41,6 +44,7 @@ removeChannel = function(channel) {
   if (idx !== -1) {
     channels.splice(idx, 1);
   }
+  location.hash = channels.join(',');
   if (channels.length === 0) {
     $('.ifchannel').hide();
     return null;
@@ -106,6 +110,13 @@ newNick = function(newNick) {
 join = function(channel) {
   channel = sanitize(channel);
   return emit('join', {
+    channel: channel
+  });
+};
+
+listen = function(channel) {
+  channel = sanitize(channel);
+  return emit('listen', {
     channel: channel
   });
 };
@@ -297,6 +308,8 @@ execute = function(cmd) {
     case 'join':
     case 'j':
       return join(args[0]);
+    case 'listen':
+      return listen(args[0]);
     case 'names':
     case 'n':
       return names((_ref2 = args[0]) != null ? _ref2 : mychannel);
@@ -323,6 +336,8 @@ execute = function(cmd) {
       return next();
     case 'prev':
       return prev();
+    case 'raw':
+      return emit(args[0], JSON.parse(args.slice(1).join(' ')));
     default:
       return show("*** I don't know that command: " + command + ".");
   }
@@ -470,7 +485,7 @@ initSocket = function() {
 };
 
 $(function() {
-  var clicks, doLayout, focus, initialChannels, timer, windowHeight;
+  var c, clicks, doLayout, focus, initialChannels, timer, windowHeight, _i, _len;
   mynick = $('.mynick').html();
   initSocket();
   focus = function() {
@@ -535,6 +550,12 @@ $(function() {
   });
   initialChannels = (window.location.hash.replace(/^#/, '')).trim().split(',');
   console.log("initials " + (JSON.stringify(initialChannels)));
+  for (_i = 0, _len = initialChannels.length; _i < _len; _i++) {
+    c = initialChannels[_i];
+    if (c) {
+      listen(c);
+    }
+  }
   windowHeight = $(window).height();
   $(window).resize(function() {
     var newHeight;

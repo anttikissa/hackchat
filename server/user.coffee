@@ -65,7 +65,6 @@ class User
 	socketConnected: (socket) ->
 		@sockets[socket.id] = socket
 		log.d "#{this}: connected. Sockets: #{_.keys(@sockets).join ' '}"
-		log.d "TODO Tell socket that we're on channels #{_.keys @channels}"
 		@emit 'channels', channels: @channelList(), you: true
 
 	socketDisconnected: (socket) ->
@@ -90,10 +89,16 @@ class User
 		@emit 'info', { msg: msg }
 
 	emit: (what, data) ->
-#		log "Emit #{what} to sockets..."
 		for id, socket of @sockets
-#			log "Emit #{what} to socket #{id}..."
 			socket.emit what, data
+	
+	emitToSocket: (socketId, what, data) ->
+		socket = @sockets[socketId]
+		if socket?
+			log.d "emitToSocket; user #{this}: emitting to socket #{socketId}"
+			socket.emit what, data
+		else
+			log.d "User #{this}: Tried to emit to inexistent socket #{socketId}"
 
 	# Commands sent by client
 	

@@ -22,6 +22,9 @@ Make sure that messages directed to an user are sent even though the user is
 disconnected for some reason.  Have User have a queue of unsent messages (which
 are then, discarded, if they pile up uncollected?)?
 
+Client-side error handling: /join, /listen (maybe others) give errors without
+arguments for example.
+
 Implement something like "*** zum is on channels: #foo #bar #zot" that is sent
 to client when socket is connected, and have the client update its channel
 status from there.  This will also come as part of a `/whois` result.
