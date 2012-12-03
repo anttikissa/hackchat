@@ -18,8 +18,8 @@ fs = require 'fs'
 packageJson = { version: '0.0.6' }
 
 sessions = require './sessions'
-sessionUtil = require './sessionUtil'
-Session = sessionUtil.Session
+#sessionUtil = require './sessionUtil'
+#Session = sessionUtil.Session
 
 #connection = require('./connection').connection(sessionStore)
 
