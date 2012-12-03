@@ -293,10 +293,7 @@ execute = function(cmd) {
     case 'nick':
       return newNick(args[0]);
     case 'ping':
-      if (debug) {
-        return ping();
-      }
-      break;
+      return ping();
     case 'join':
     case 'j':
       return join(args[0]);
@@ -350,7 +347,9 @@ initSocket = function() {
     connect: function() {
       show("*** Connected to server.");
       connected = true;
-      return ping();
+      if (debug) {
+        return ping();
+      }
     },
     names: function(_arg) {
       var channel, names;
@@ -377,8 +376,10 @@ initSocket = function() {
         channels = data.channels;
         if (channels.length) {
           setChannel(channels[0]);
+          return show("*** You're on channels: " + (channelNames.join(' ')));
+        } else {
+          return show("*** You're not on any channels.");
         }
-        return show("*** You're on channels: " + (channelNames.join(' ')));
       } else {
         return show("*** " + data.nick + " is on channels: " + (channelNames.join(' ')));
       }

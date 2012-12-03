@@ -20,9 +20,13 @@ class Channel
 
 	join: (user, opts) ->
 #		log "Channel.join #{user}, this #{this}"
+		alreadyThere = @users[user.id]?
 		@users[user.id] = user
-		unless opts?.silent
-			@emit 'join', nick: user.nick(), channel: @id
+		if alreadyThere
+			user.info "You're already on channel #{this}."
+		else
+			unless opts?.silent
+				@emit 'join', nick: user.nick(), channel: @id
 
 	leave: (user, message) ->
 		@emit 'leave', {

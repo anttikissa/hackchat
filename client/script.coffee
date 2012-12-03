@@ -221,7 +221,7 @@ execute = (cmd) ->
 
 	switch command
 		when 'nick' then newNick args[0]
-		when 'ping' then if debug then ping()
+		when 'ping' then ping()
 		when 'join', 'j' then join args[0]
 		when 'names', 'n' then names (args[0] ? mychannel)
 		when 'whois', 'w' then whois (args[0] ? mynick)
@@ -253,7 +253,8 @@ initSocket = () ->
 		connect: ->
 			show "*** Connected to server."
 			connected = true
-			ping()
+			if debug
+				ping()
 
 		names: ({ channel, names }) ->
 			names.sort()
@@ -273,7 +274,9 @@ initSocket = () ->
 				channels = data.channels
 				if channels.length
 					setChannel channels[0]
-				show "*** You're on channels: #{channelNames.join ' '}"
+					show "*** You're on channels: #{channelNames.join ' '}"
+				else
+					show "*** You're not on any channels."
 			else
 				show "*** #{data.nick} is on channels: #{channelNames.join ' '}"
 
