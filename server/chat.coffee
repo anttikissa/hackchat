@@ -124,6 +124,8 @@ class Chat
 		user.socketConnected(socket)
 
 	socketDisconnected: (socket) ->
+		# TODO unlisten to all channels
+		# TODO possibly leave some of the channels (or not?)
 		log.d "socket closed #{socket.id}"
 		socket.user.socketDisconnected(socket)
 

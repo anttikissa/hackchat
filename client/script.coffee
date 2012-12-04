@@ -104,6 +104,7 @@ leave = (channel, message) ->
 		show '*** Please specify channel.'
 	else
 		channel = sanitize channel
+		emit 'unlisten', channel: channel
 		emit 'leave', channel: channel, message: message || "leaving"
 
 names = (channel) ->

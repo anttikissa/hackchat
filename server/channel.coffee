@@ -59,6 +59,7 @@ class Channel
 			channel: @id
 			message: message
 		}
+		# TODO unlisten to all sockets of user
 		delete @users[user.id]
 		# TODO save users of channel to somewhere
 		# TODO if no users on channel, get channel removed

@@ -135,6 +135,9 @@ leave = function(channel, message) {
     return show('*** Please specify channel.');
   } else {
     channel = sanitize(channel);
+    emit('unlisten', {
+      channel: channel
+    });
     return emit('leave', {
       channel: channel,
       message: message || "leaving"
