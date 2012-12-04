@@ -56,6 +56,7 @@ removeChannel = function(channel) {
 };
 
 setChannel = function(next) {
+  console.log("setChannel " + next);
   mychannel = next;
   if (next) {
     $('.mychannel').html('#' + next);
@@ -135,9 +136,6 @@ leave = function(channel, message) {
     return show('*** Please specify channel.');
   } else {
     channel = sanitize(channel);
-    emit('unlisten', {
-      channel: channel
-    });
     return emit('leave', {
       channel: channel,
       message: message || "leaving"
@@ -396,7 +394,7 @@ initSocket = function() {
       return show("*** pong - roundtrip " + (now - backThen) + " ms");
     },
     channels: function(data) {
-      var channel, channelNames, idx, _i, _len, _ref;
+      var channel, channelNames, idx, _i, _j, _len, _len1, _ref;
       channelNames = [];
       _ref = data.channels;
       for (idx = _i = 0, _len = _ref.length; _i < _len; idx = ++_i) {
@@ -405,6 +403,15 @@ initSocket = function() {
       }
       if (data.you) {
         channels = data.channels;
+        if (!initialChannels.length) {
+          console.log("LENGTH ZERO");
+          for (_j = 0, _len1 = channels.length; _j < _len1; _j++) {
+            channel = channels[_j];
+            listen(channel);
+          }
+        } else {
+          console.log("LENGTH fygar " + initialChannels.length);
+        }
         if (channels.length) {
           setChannel(channels[0]);
           return show("*** You're on channels: " + (channelNames.join(' ')));
@@ -501,7 +508,7 @@ initSocket = function() {
 };
 
 $(function() {
-  var c, clicks, doLayout, focus, timer, windowHeight, _i, _len;
+  var c, channelsInHash, clicks, doLayout, focus, timer, windowHeight, _i, _j, _len, _len1;
   mynick = $('.mynick').html();
   initSocket();
   focus = function() {
@@ -564,13 +571,17 @@ $(function() {
   $('time').live('click', function(ev) {
     return show("*** That's " + (new Date($(ev.target).attr('datetime'))) + ".");
   });
-  initialChannels = (window.location.hash.replace(/^#/, '')).trim().split(',');
-  console.log("initials " + (JSON.stringify(initialChannels)));
-  for (_i = 0, _len = initialChannels.length; _i < _len; _i++) {
-    c = initialChannels[_i];
+  channelsInHash = (window.location.hash.replace(/^#/, '')).trim().split(',');
+  for (_i = 0, _len = channelsInHash.length; _i < _len; _i++) {
+    c = channelsInHash[_i];
     if (c) {
-      listen(c);
+      initialChannels.push(c);
     }
+  }
+  console.log("initials " + (JSON.stringify(initialChannels)));
+  for (_j = 0, _len1 = initialChannels.length; _j < _len1; _j++) {
+    c = initialChannels[_j];
+    listen(c);
   }
   windowHeight = $(window).height();
   $(window).resize(function() {

@@ -48,7 +48,7 @@ removeChannel = (channel) ->
 		return channels[(idx - 1 + channels.length) % channels.length]
 
 setChannel = (next) ->
-#	console.log "setChannel #{next}"
+	console.log "setChannel #{next}"
 	mychannel = next
 	if next
 #		console.log "mychannel is now #{next}"
@@ -104,7 +104,6 @@ leave = (channel, message) ->
 		show '*** Please specify channel.'
 	else
 		channel = sanitize channel
-		emit 'unlisten', channel: channel
 		emit 'leave', channel: channel, message: message || "leaving"
 
 names = (channel) ->
@@ -292,9 +291,25 @@ initSocket = () ->
 				channelNames.push('#' + channel)
 			if data.you
 				channels = data.channels
+#				channels = []
+				# TODO where to figure out the listened-to channels?
+				# It's initialChannels, right?
+					
+				# TODO do something about it
 				# Do it something like this
 #				allChannels = data.channels
 #				if allChannels
+
+				# If no channels on hash, and we get our channels,
+				# listen to all of them
+				if !initialChannels.length
+					console.log "LENGTH ZERO"
+					for channel in channels
+						listen channel
+#					channels = data.channels
+				else
+					console.log "LENGTH fygar #{initialChannels.length}"
+
 				if channels.length
 					setChannel channels[0]
 					show "*** You're on channels: #{channelNames.join ' '}"
@@ -416,12 +431,14 @@ $ ->
 	$('time').live 'click', (ev) ->
 		show "*** That's #{new Date($(ev.target).attr('datetime'))}."
 
-	initialChannels = (window.location.hash.replace /^#/, '').trim().split ','
+	channelsInHash = (window.location.hash.replace /^#/, '').trim().split ','
+	for c in channelsInHash	
+		initialChannels.push c if c
 
 	# TODO handling of these if no channels to listen
 	console.log "initials #{JSON.stringify initialChannels}"
 	for c in initialChannels
-		listen c if c
+		listen c
 
 	windowHeight = $(window).height()
 

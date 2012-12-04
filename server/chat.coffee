@@ -26,6 +26,7 @@ class Chat
 				user.info "No such channel #{channelName}"
 			else
 				channel.leave user, message
+				channel.unlisten socket.id
 				user.leave channel
 
 		protocol =
