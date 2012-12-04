@@ -33,17 +33,24 @@ class Channel
 				@emit 'join', nick: user.nick(), channel: @id
 
 	listen: (user, socketId) ->
+		alreadyThere = @listeners[socketId]?
 		@listeners[socketId] = user
 
-		if @users[user.id]
-			# Should really emitToSocket to that socket!
-			user.info "Now listening to channel #{this}."
+		if alreadyThere
+			user.info "You're already listening to channel #{this}."
 		else
-			user.info "You're not on channel #{this}, cannot listen."
-			#{user.id} not on channel #{this}, yet is trying to listen to it! Should not happen!"
-			# TODO or just complain to the user directly.
+			if @users[user.id]
+				# Should really emitToSocket to that socket!
+				user.info "Now listening to channel #{this}."
+			else
+				user.info "You're not on channel #{this}, cannot listen."
+				#{user.id} not on channel #{this}, yet is trying to listen to it! Should not happen!"
+				# TODO or just complain to the user directly.
 
 	unlisten: (socketId) ->
+		user = @listeners[socketId]
+		if user
+			user.info "No longer listening to channel #{this}."
 		delete @listeners[socketId]
 
 	leave: (user, message) ->

@@ -1,4 +1,4 @@
-var addChannel, allChannels, channels, connected, debug, down, emit, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, isCommand, join, leave, list, listen, log, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, s, sanitize, say, setChannel, show, socket, up, whois,
+var addChannel, allChannels, channels, connected, debug, down, emit, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, initialChannels, isCommand, join, leave, list, listen, log, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, s, sanitize, say, setChannel, show, socket, unlisten, up, whois,
   __slice = [].slice,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
@@ -17,6 +17,8 @@ sanitize = function(channel) {
 connected = false;
 
 socket = io.connect();
+
+initialChannels = [];
 
 channels = [];
 
@@ -121,6 +123,13 @@ listen = function(channel) {
   });
 };
 
+unlisten = function(channel) {
+  channel = sanitize(channel);
+  return emit('unlisten', {
+    channel: channel
+  });
+};
+
 leave = function(channel, message) {
   if (!channel) {
     return show('*** Please specify channel.');
@@ -183,6 +192,8 @@ help = function(help) {
   show("*** /list - show channels");
   show("*** /say <message> - say on current channel.");
   show("*** /join <channel> - join a channel. Alias: /j");
+  show("*** /listen <channel> - listen to a channel.");
+  show("*** /unlisten <channel> - don't listen to a channel.");
   show("*** /names [<channel>] - show who's on a channel");
   show("*** /next - next channel (shortcut: Ctrl-X)");
   show("*** /prev - previous channel");
@@ -310,6 +321,8 @@ execute = function(cmd) {
       return join(args[0]);
     case 'listen':
       return listen(args[0]);
+    case 'unlisten':
+      return unlisten(args[0]);
     case 'names':
     case 'n':
       return names((_ref2 = args[0]) != null ? _ref2 : mychannel);
@@ -485,7 +498,7 @@ initSocket = function() {
 };
 
 $(function() {
-  var c, clicks, doLayout, focus, initialChannels, timer, windowHeight, _i, _len;
+  var c, clicks, doLayout, focus, timer, windowHeight, _i, _len;
   mynick = $('.mynick').html();
   initSocket();
   focus = function() {

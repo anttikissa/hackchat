@@ -12,10 +12,13 @@ socket = io.connect()
 
 # Channel management
 
-# List of all channels this socket is on.
+# Those that came from the hash on the first page load: /#foo,bar,zot
+initialChannels = []
+
+# List of all channels this socket is on. Listen/unlisten controls this.
 channels = []
 
-# List of all channels this user is on.
+# List of all channels this user is on. Join/leave controls this.
 allChannels = []
 
 # Command history.
@@ -92,6 +95,10 @@ listen = (channel) ->
 	channel = sanitize channel
 	emit 'listen', channel: channel
 
+unlisten = (channel) ->
+	channel = sanitize channel
+	emit 'unlisten', channel: channel
+
 leave = (channel, message) ->
 	if not channel
 		show '*** Please specify channel.'
@@ -141,6 +148,8 @@ help = (help) ->
 	show "*** /list - show channels"
 	show "*** /say <message> - say on current channel."
 	show "*** /join <channel> - join a channel. Alias: /j"
+	show "*** /listen <channel> - listen to a channel."
+	show "*** /unlisten <channel> - don't listen to a channel."
 	show "*** /names [<channel>] - show who's on a channel"
 	show "*** /next - next channel (shortcut: Ctrl-X)"
 	show "*** /prev - previous channel"
@@ -231,6 +240,7 @@ execute = (cmd) ->
 		when 'ping' then ping()
 		when 'join', 'j' then join args[0]
 		when 'listen' then listen args[0]
+		when 'unlisten' then unlisten args[0]
 		when 'names', 'n' then names (args[0] ? mychannel)
 		when 'whois', 'w' then whois (args[0] ? mynick)
 		when 'list' then list()
@@ -283,6 +293,7 @@ initSocket = () ->
 				channels = data.channels
 				# Do it something like this
 #				allChannels = data.channels
+#				if allChannels
 				if channels.length
 					setChannel channels[0]
 					show "*** You're on channels: #{channelNames.join ' '}"

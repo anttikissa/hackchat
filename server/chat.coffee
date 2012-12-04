@@ -46,6 +46,7 @@ class Chat
 					return user.info "Channels must be alphanumeric and at most 25 characters."
 				channel = Channel.get channelName
 				channel.join user
+				channel.listen user, socket.id
 				user.join channel
 				log "*** #{user.nick()} has joined channel #{channel}."
 
@@ -58,6 +59,16 @@ class Chat
 				channel = Channel.get channelName
 				channel.listen user, socket.id
 
+			# TODO combine channel name handling between join, listen and this
+			unlisten: ({ channel }) =>
+				if not channel
+					return user.info "Please specify a channel to listen."
+				channelName = sanitizeChannel channel
+				if not validChannelName channelName
+					return user.info "Channels must be alphanumeric and at most 25 characters."
+				channel = Channel.get channelName
+				channel.unlisten socket.id
+				
 			names: ({ channel }) ->
 				channelName = sanitizeChannel channel
 				channel = Channel.getIfExists channelName
