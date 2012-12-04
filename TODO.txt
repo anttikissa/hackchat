@@ -1,7 +1,14 @@
 # Items to do
 
+Make channels work so that localhost/#foo,bar works again.
+
 Handle redis downtime even more gracefully (now session is just undefined in the
 session interceptor).
+
+Client-side error handling: /join, /listen (maybe others) give errors without
+arguments for example.
+
+Implement /list and show most popular channels, too.
 
 Implement more graceful server reconnecting.
     Server should hold onto old connections while the new server is starting.
@@ -11,8 +18,6 @@ Implement more graceful server reconnecting.
 
     This likely requires some child process magic.
 
-Make channels work so that localhost/#foo,bar works again.
-
 Immediately reconnect when user issues a command.
     socket.io magic?
 
@@ -21,9 +26,6 @@ Multi-argument /join and /leave (possibly)
 Make sure that messages directed to an user are sent even though the user is
 disconnected for some reason.  Have User have a queue of unsent messages (which
 are then, discarded, if they pile up uncollected?)?
-
-Client-side error handling: /join, /listen (maybe others) give errors without
-arguments for example.
 
 Implement something like "*** zum is on channels: #foo #bar #zot" that is sent
 to client when socket is connected, and have the client update its channel
