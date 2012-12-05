@@ -74,11 +74,11 @@ escapeHtml = (s) ->
 	s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 	.replace(/"/g, "&quot;") .replace(/'/g, "&#039;")
 
-debug = false
+debug = true
 
 emit = (what, msg) ->
 	if debug
-		show "=> '#{what}': #{JSON.stringify msg}"
+		show "Send #{what}: #{JSON.stringify msg}"
 	socket.emit what, msg
 
 ping = ->
@@ -290,8 +290,8 @@ initSocket = () ->
 			for channel, idx in data.channels
 				channelNames.push('#' + channel)
 			if data.you
-				channels = data.channels
-#				channels = []
+#				channels = data.channels
+				allChannels = []
 				# TODO where to figure out the listened-to channels?
 				# It's initialChannels, right?
 					
@@ -304,19 +304,22 @@ initSocket = () ->
 				# listen to all of them
 				if !initialChannels.length
 					console.log "LENGTH ZERO"
-					for channel in channels
+					for channel in data.channels
 						listen channel
 #					channels = data.channels
 				else
 					console.log "LENGTH fygar #{initialChannels.length}"
 
-				if channels.length
+				if data.channels.length
 					setChannel channels[0]
 					show "*** You're on channels: #{channelNames.join ' '}"
 				else
 					show "*** You're not on any channels."
 			else
 				show "*** #{data.nick} is on channels: #{channelNames.join ' '}"
+
+		listen: (data) ->
+			console.log data
 
 		nick: ({ oldNick, newNick, you }) ->
 			info = { nick: { oldNick: oldNick, newNick: newNick } }
@@ -369,9 +372,9 @@ initSocket = () ->
 #				log "Got command #{what}"
 				if debug
 					if data?
-						show "<= '#{what}': #{s data}"
+						show "Receive #{what.toUpperCase()}: #{s data}"
 					else
-						show "<= '#{what}'"
+						show "Receive #{what.toUpperCase()}"
 				action data
 
 	

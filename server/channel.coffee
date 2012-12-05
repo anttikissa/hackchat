@@ -37,11 +37,18 @@ class Channel
 		@listeners[socketId] = user
 
 		if alreadyThere
-			user.info "You're already listening to channel #{this}."
+			user.emitToSocket socketId,
+				'info',
+				{ msg: "You're already listening to channel #{this}." }
 		else
 			if @users[user.id]
 				# Should really emitToSocket to that socket!
-				user.info "Now listening to channel #{this}."
+#				user.info "Now listening to channel #{this}."
+				# TODO here we should only emit to the right socket.
+				user.emitToSocket socketId,
+					'listen',
+					# TODO you should be unnecessary
+					{ nick: user.nick(), channel: @id, you: true }
 			else
 				user.info "You're not on channel #{this}, cannot listen."
 				#{user.id} not on channel #{this}, yet is trying to listen to it! Should not happen!"

@@ -2,6 +2,10 @@
 
 Make channels work so that localhost/#foo,bar works again.
 
+Go through all resource-leaking TODOs where we don't unlisten to channels when
+user dies or leaves or something, and make that resources are collected properly
+at all times.
+
 Handle redis downtime even more gracefully (now session is just undefined in the
 session interceptor).
 

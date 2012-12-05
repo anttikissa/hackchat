@@ -89,11 +89,11 @@ escapeHtml = function(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 };
 
-debug = false;
+debug = true;
 
 emit = function(what, msg) {
   if (debug) {
-    show("=> '" + what + "': " + (JSON.stringify(msg)));
+    show("Send " + what + ": " + (JSON.stringify(msg)));
   }
   return socket.emit(what, msg);
 };
@@ -394,7 +394,7 @@ initSocket = function() {
       return show("*** pong - roundtrip " + (now - backThen) + " ms");
     },
     channels: function(data) {
-      var channel, channelNames, idx, _i, _j, _len, _len1, _ref;
+      var channel, channelNames, idx, _i, _j, _len, _len1, _ref, _ref1;
       channelNames = [];
       _ref = data.channels;
       for (idx = _i = 0, _len = _ref.length; _i < _len; idx = ++_i) {
@@ -402,17 +402,18 @@ initSocket = function() {
         channelNames.push('#' + channel);
       }
       if (data.you) {
-        channels = data.channels;
+        allChannels = [];
         if (!initialChannels.length) {
           console.log("LENGTH ZERO");
-          for (_j = 0, _len1 = channels.length; _j < _len1; _j++) {
-            channel = channels[_j];
+          _ref1 = data.channels;
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            channel = _ref1[_j];
             listen(channel);
           }
         } else {
           console.log("LENGTH fygar " + initialChannels.length);
         }
-        if (channels.length) {
+        if (data.channels.length) {
           setChannel(channels[0]);
           return show("*** You're on channels: " + (channelNames.join(' ')));
         } else {
@@ -421,6 +422,9 @@ initSocket = function() {
       } else {
         return show("*** " + data.nick + " is on channels: " + (channelNames.join(' ')));
       }
+    },
+    listen: function(data) {
+      return console.log(data);
     },
     nick: function(_arg) {
       var info, newNick, oldNick, you;
@@ -495,9 +499,9 @@ initSocket = function() {
       return socket.on(what, function(data) {
         if (debug) {
           if (data != null) {
-            show("<= '" + what + "': " + (s(data)));
+            show("Receive " + (what.toUpperCase()) + ": " + (s(data)));
           } else {
-            show("<= '" + what + "'");
+            show("Receive " + (what.toUpperCase()));
           }
         }
         return action(data);
