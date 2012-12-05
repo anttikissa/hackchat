@@ -30,10 +30,12 @@ newestCommand = ''
 mynick = null
 mychannel = null
 
+# Add channel to list of current channels; if already there, do nothing
 addChannel = (channel) ->
-	channels.push channel
-	location.hash = channels.join ','
-	$('.ifchannel').show()
+	if channel not in channels
+		channels.push channel
+		location.hash = channels.join ','
+		$('.ifchannel').show()
 
 # Remove channel from list, return channel next to it
 removeChannel = (channel) ->
@@ -54,9 +56,12 @@ setChannel = (next) ->
 #		console.log "mychannel is now #{next}"
 		$('.mychannel').html('#' + next)
 		$('.ifchannel').show()
+		addChannel next
 	else
 		$('.mychannel').html('')
 		$('.ifchannel').hide()
+
+	console.log "post setChannel, channels is #{channels}"
 
 next = () ->
 	if channels.length <= 1 || not mychannel
@@ -78,7 +83,7 @@ debug = true
 
 emit = (what, msg) ->
 	if debug
-		show "Send #{what}: #{JSON.stringify msg}"
+		show "Sent #{what.toUpperCase()}: #{JSON.stringify msg}"
 	socket.emit what, msg
 
 ping = ->
@@ -311,15 +316,21 @@ initSocket = () ->
 					console.log "LENGTH fygar #{initialChannels.length}"
 
 				if data.channels.length
-					setChannel channels[0]
+#					setChannel channels[0]
 					show "*** You're on channels: #{channelNames.join ' '}"
 				else
 					show "*** You're not on any channels."
 			else
 				show "*** #{data.nick} is on channels: #{channelNames.join ' '}"
 
-		listen: (data) ->
-			console.log data
+		listen: ({ nick, channel, you }) ->
+			unless you
+				show "*** TODO FIXME BROKEN IS THIS"
+			setChannel channel
+
+			# If all goes well, it's ALWAYS you.
+			if you
+				console.log 'listen', channel
 
 		nick: ({ oldNick, newNick, you }) ->
 			info = { nick: { oldNick: oldNick, newNick: newNick } }
@@ -345,6 +356,7 @@ initSocket = () ->
 		join: ({ nick, channel }) ->
 			tellUser = true
 			if nick == mynick
+				# TODO should check 'you' instead? 
 				setChannel(channel)
 				if channel in channels
 					tellUser = false
@@ -372,9 +384,9 @@ initSocket = () ->
 #				log "Got command #{what}"
 				if debug
 					if data?
-						show "Receive #{what.toUpperCase()}: #{s data}"
+						show "Got #{what.toUpperCase()}: #{s data}"
 					else
-						show "Receive #{what.toUpperCase()}"
+						show "Got #{what.toUpperCase()}"
 				action data
 
 	

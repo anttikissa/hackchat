@@ -1,6 +1,6 @@
 var addChannel, allChannels, channels, connected, debug, down, emit, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, initialChannels, isCommand, join, leave, list, listen, log, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, s, sanitize, say, setChannel, show, socket, unlisten, up, whois,
-  __slice = [].slice,
-  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+  __slice = [].slice;
 
 log = function() {
   return console.log.apply(console, arguments);
@@ -35,9 +35,11 @@ mynick = null;
 mychannel = null;
 
 addChannel = function(channel) {
-  channels.push(channel);
-  location.hash = channels.join(',');
-  return $('.ifchannel').show();
+  if (__indexOf.call(channels, channel) < 0) {
+    channels.push(channel);
+    location.hash = channels.join(',');
+    return $('.ifchannel').show();
+  }
 };
 
 removeChannel = function(channel) {
@@ -60,11 +62,13 @@ setChannel = function(next) {
   mychannel = next;
   if (next) {
     $('.mychannel').html('#' + next);
-    return $('.ifchannel').show();
+    $('.ifchannel').show();
+    addChannel(next);
   } else {
     $('.mychannel').html('');
-    return $('.ifchannel').hide();
+    $('.ifchannel').hide();
   }
+  return console.log("post setChannel, channels is " + channels);
 };
 
 next = function() {
@@ -93,7 +97,7 @@ debug = true;
 
 emit = function(what, msg) {
   if (debug) {
-    show("Send " + what + ": " + (JSON.stringify(msg)));
+    show("Sent " + (what.toUpperCase()) + ": " + (JSON.stringify(msg)));
   }
   return socket.emit(what, msg);
 };
@@ -414,7 +418,6 @@ initSocket = function() {
           console.log("LENGTH fygar " + initialChannels.length);
         }
         if (data.channels.length) {
-          setChannel(channels[0]);
           return show("*** You're on channels: " + (channelNames.join(' ')));
         } else {
           return show("*** You're not on any channels.");
@@ -423,8 +426,16 @@ initSocket = function() {
         return show("*** " + data.nick + " is on channels: " + (channelNames.join(' ')));
       }
     },
-    listen: function(data) {
-      return console.log(data);
+    listen: function(_arg) {
+      var channel, nick, you;
+      nick = _arg.nick, channel = _arg.channel, you = _arg.you;
+      if (!you) {
+        show("*** TODO FIXME BROKEN IS THIS");
+      }
+      setChannel(channel);
+      if (you) {
+        return console.log('listen', channel);
+      }
     },
     nick: function(_arg) {
       var info, newNick, oldNick, you;
@@ -499,9 +510,9 @@ initSocket = function() {
       return socket.on(what, function(data) {
         if (debug) {
           if (data != null) {
-            show("Receive " + (what.toUpperCase()) + ": " + (s(data)));
+            show("Got " + (what.toUpperCase()) + ": " + (s(data)));
           } else {
-            show("Receive " + (what.toUpperCase()));
+            show("Got " + (what.toUpperCase()));
           }
         }
         return action(data);
