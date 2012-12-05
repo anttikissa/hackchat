@@ -227,7 +227,7 @@ ul.channels {
 }
 ul.channels li {
   display: inline;
-  color: #888;
+  color: #aaa;
 }
 ul.channels li:after {
   content: ' | ';

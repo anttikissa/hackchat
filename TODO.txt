@@ -2,6 +2,8 @@
 
 Make channels work so that localhost/#foo,bar works again.
 
+If you go to localhost/#gaga and are not on #gaga, then weirdity happens.
+
 Go through all resource-leaking TODOs where we don't unlisten to channels when
 user dies or leaves or something, and make that resources are collected properly
 at all times.

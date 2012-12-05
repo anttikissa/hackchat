@@ -31,6 +31,7 @@ mynick = null
 mychannel = null
 
 updateChannels = ->
+#	console.log "updateChannels. channels [#{channels.join ','}]"
 	location.hash = channels.join ','
 	lis = ""
 	for channel in channels
@@ -42,33 +43,36 @@ addChannel = (channel) ->
 	if channel not in channels
 		channels.push channel
 		updateChannels()
-		$('.ifchannel').show()
+		if channels.length > 1
+			$('.ifchannel').show()
 
 # Remove channel from list, return channel next to it
 removeChannel = (channel) ->
 	idx = channels.indexOf channel
+#	console.log "removeChannel. channels [#{channels.join ','}] (#{channels.length})"
+#	console.log "idx is #{idx}"
 	if idx != -1
 		channels.splice idx, 1
+#	console.log "removeChannel. channels spliced: [#{channels.join ','}] (#{channels.length})"
 	updateChannels()
-	if channels.length == 0
+	if channels.length <= 1
 		$('.ifchannel').hide()
+	if channels.length == 0
 		return null
 	else
 		return channels[(idx - 1 + channels.length) % channels.length]
 
 setChannel = (next) ->
-	console.log "setChannel #{next}"
+#	console.log "setChannel #{next}"
 	mychannel = next
-	addChannel next
 
 	if next
+		addChannel next
 		$('.mychannel').html('#' + next)
-		$('.ifchannel').show()
+		if channels.length >= 2
+			$('.ifchannel').show()
 		$('.channels li').each (idx, elem) ->
 			content = $(elem).html()
-			console.log elem
-			console.log "HTML IS '#{content}'"
-			console.log "NEXT IS '#{next}'"
 			$(elem)[if content == next then 'addClass' else 'removeClass'] 'current'
 	else
 		$('.mychannel').html('')
@@ -196,12 +200,15 @@ formatTime = (date) ->
 	"#{hours}:#{mins}"
 
 show = (msg, ts) ->
+	showRaw escapeHtml(msg), ts
+
+showRaw = (msg, ts) ->
 	ts ?= new Date().getTime()
 	date = new Date(ts)
 	time = formatTime(date)
 
+	$('.chat').append "<p><time datetime='#{date.toISOString()}'>#{time}</time> #{msg}</p>"
 	# probably close enough
-	$('.chat').append "<p><time datetime='#{date.toISOString()}'>#{time}</time> #{escapeHtml msg}</p>"
 	$('.chat').scrollTop 1000000
 
 isCommand = (cmd) ->
@@ -321,12 +328,8 @@ initSocket = () ->
 				# If no channels on hash, and we get our channels,
 				# listen to all of them
 				if !initialChannels.length
-					console.log "LENGTH ZERO"
 					for channel in data.channels
 						listen channel
-#					channels = data.channels
-				else
-					console.log "LENGTH fygar #{initialChannels.length}"
 
 				if data.channels.length
 #					setChannel channels[0]
@@ -340,10 +343,6 @@ initSocket = () ->
 			unless you
 				show "*** TODO FIXME BROKEN IS THIS"
 			setChannel channel
-
-			# If all goes well, it's ALWAYS you.
-			if you
-				console.log 'listen', channel
 
 		nick: ({ oldNick, newNick, you }) ->
 			info = { nick: { oldNick: oldNick, newNick: newNick } }
@@ -388,7 +387,10 @@ initSocket = () ->
 					setChannel(nextChannel)
 
 		say: ({ nick, channel, msg }) ->
-			show "<#{nick}:##{channel}> #{msg}"
+			style = if channels.length <= 1 then 'display: none' else ''
+
+			# TODO should control visi
+			showRaw "&lt;#{escapeHtml nick}<span class='ifchannel' style='#{style}'>:##{escapeHtml channel}</span>&gt; #{escapeHtml msg}"
 
 	for what, action of protocol
 		do (what, action) ->
@@ -466,7 +468,7 @@ $ ->
 	# TODO handling of these if no channels to listen
 	console.log "initials #{JSON.stringify initialChannels}"
 	for c in initialChannels
-		listen c
+		join c
 
 	windowHeight = $(window).height()
 

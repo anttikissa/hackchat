@@ -1,4 +1,4 @@
-var addChannel, allChannels, channels, connected, debug, down, emit, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, initialChannels, isCommand, join, leave, list, listen, log, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, s, sanitize, say, setChannel, show, socket, unlisten, up, updateChannels, whois,
+var addChannel, allChannels, channels, connected, debug, down, emit, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, initialChannels, isCommand, join, leave, list, listen, log, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, s, sanitize, say, setChannel, show, showRaw, socket, unlisten, up, updateChannels, whois,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
   __slice = [].slice;
 
@@ -49,7 +49,9 @@ addChannel = function(channel) {
   if (__indexOf.call(channels, channel) < 0) {
     channels.push(channel);
     updateChannels();
-    return $('.ifchannel').show();
+    if (channels.length > 1) {
+      return $('.ifchannel').show();
+    }
   }
 };
 
@@ -60,8 +62,10 @@ removeChannel = function(channel) {
     channels.splice(idx, 1);
   }
   updateChannels();
-  if (channels.length === 0) {
+  if (channels.length <= 1) {
     $('.ifchannel').hide();
+  }
+  if (channels.length === 0) {
     return null;
   } else {
     return channels[(idx - 1 + channels.length) % channels.length];
@@ -69,18 +73,16 @@ removeChannel = function(channel) {
 };
 
 setChannel = function(next) {
-  console.log("setChannel " + next);
   mychannel = next;
-  addChannel(next);
   if (next) {
+    addChannel(next);
     $('.mychannel').html('#' + next);
-    $('.ifchannel').show();
+    if (channels.length >= 2) {
+      $('.ifchannel').show();
+    }
     return $('.channels li').each(function(idx, elem) {
       var content;
       content = $(elem).html();
-      console.log(elem);
-      console.log("HTML IS '" + content + "'");
-      console.log("NEXT IS '" + next + "'");
       return $(elem)[content === next ? 'addClass' : 'removeClass']('current');
     });
   } else {
@@ -254,13 +256,17 @@ formatTime = function(date) {
 };
 
 show = function(msg, ts) {
+  return showRaw(escapeHtml(msg), ts);
+};
+
+showRaw = function(msg, ts) {
   var date, time;
   if (ts == null) {
     ts = new Date().getTime();
   }
   date = new Date(ts);
   time = formatTime(date);
-  $('.chat').append("<p><time datetime='" + (date.toISOString()) + "'>" + time + "</time> " + (escapeHtml(msg)) + "</p>");
+  $('.chat').append("<p><time datetime='" + (date.toISOString()) + "'>" + time + "</time> " + msg + "</p>");
   return $('.chat').scrollTop(1000000);
 };
 
@@ -426,14 +432,11 @@ initSocket = function() {
       if (data.you) {
         allChannels = [];
         if (!initialChannels.length) {
-          console.log("LENGTH ZERO");
           _ref1 = data.channels;
           for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
             channel = _ref1[_j];
             listen(channel);
           }
-        } else {
-          console.log("LENGTH fygar " + initialChannels.length);
         }
         if (data.channels.length) {
           return show("*** You're on channels: " + (channelNames.join(' ')));
@@ -450,10 +453,7 @@ initSocket = function() {
       if (!you) {
         show("*** TODO FIXME BROKEN IS THIS");
       }
-      setChannel(channel);
-      if (you) {
-        return console.log('listen', channel);
-      }
+      return setChannel(channel);
     },
     nick: function(_arg) {
       var info, newNick, oldNick, you;
@@ -516,9 +516,10 @@ initSocket = function() {
       }
     },
     say: function(_arg) {
-      var channel, msg, nick;
+      var channel, msg, nick, style;
       nick = _arg.nick, channel = _arg.channel, msg = _arg.msg;
-      return show("<" + nick + ":#" + channel + "> " + msg);
+      style = channels.length <= 1 ? 'display: none' : '';
+      return showRaw("&lt;" + (escapeHtml(nick)) + "<span class='ifchannel' style='" + style + "'>:#" + (escapeHtml(channel)) + "</span>&gt; " + (escapeHtml(msg)));
     }
   };
   _results = [];
@@ -614,7 +615,7 @@ $(function() {
   console.log("initials " + (JSON.stringify(initialChannels)));
   for (_j = 0, _len1 = initialChannels.length; _j < _len1; _j++) {
     c = initialChannels[_j];
-    listen(c);
+    join(c);
   }
   windowHeight = $(window).height();
   $(window).resize(function() {
