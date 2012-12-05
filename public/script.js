@@ -58,7 +58,6 @@ addChannel = function(channel) {
 removeChannel = function(channel) {
   var idx;
   idx = channels.indexOf(channel);
-  console.log("idx of channels is " + idx);
   if (idx !== -1) {
     channels.splice(idx, 1);
   }
@@ -69,7 +68,6 @@ removeChannel = function(channel) {
   if (channels.length === 0) {
     return null;
   } else {
-    console.log("idx of channels is " + idx);
     return channels[idx === channels.length ? idx - 1 : idx];
   }
 };
@@ -142,6 +140,8 @@ join = function(channel, opts) {
   }
   channel = sanitize(channel);
   opts.channel = channel;
+  console.log("join; ALLCHANNELS IS: ");
+  console.log(allChannels);
   return emit('join', opts);
 };
 
@@ -434,7 +434,7 @@ initSocket = function() {
         channelNames.push('#' + channel);
       }
       if (data.you) {
-        allChannels = [];
+        allChannels = data.channels;
         if (!initialChannels.length) {
           _ref1 = data.channels;
           for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {

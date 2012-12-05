@@ -22,15 +22,24 @@ class Channel
 		# Map of socket ids to user objects.
 		@listeners = Object.create null
 
+	# opts:
+	# silent (boolean): if true, don't send possible error messages to user
+	# socketId (socket id): if exists, start listening with this socket 
 	join: (user, opts) ->
 		log "Channel.join #{user}, this #{this}, opts #{s opts}"
 		alreadyThere = @users[user.id]?
 		@users[user.id] = user
+
+		if opts.socketId?
+			console.log "socket id true, listening"
+			@listen user, opts.socketId
+
 		if alreadyThere
 			unless opts?.silent
 				user.info "You're already on channel #{this}."
 			return false
 		else
+			console.log "socket id #{opts.socketId}"
 			unless opts?.silent
 				@emit 'join', nick: user.nick(), channel: @id
 			return true

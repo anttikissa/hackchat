@@ -1,6 +1,6 @@
 # Items to do
 
-Make channels work so that localhost/#foo,bar works again.
+Should catch when user changes the hash himself.
 
 If you go to localhost/#gaga and are not on #gaga, then weirdity happens.
 

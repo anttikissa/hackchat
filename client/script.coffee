@@ -44,6 +44,8 @@ addChannel = (channel) ->
 		updateChannels()
 		if channels.length > 1
 			$('.ifchannel').show()
+		# TODO update allChannels
+		# allChannels.push ...
 
 # Remove channel from list, return channel next to it
 removeChannel = (channel) ->
@@ -57,6 +59,8 @@ removeChannel = (channel) ->
 		return null
 	else
 		return channels[if idx == channels.length then idx - 1 else idx]
+	# TODO update allChannels
+	# allChannels.remove...
 
 # TODO might be a nice idea to push the next channel in the place where current
 # channel is.
@@ -111,6 +115,11 @@ newNick = (newNick) ->
 join = (channel, opts = {}) ->
 	channel = sanitize channel
 	opts.channel = channel
+	# TODO maybe should specify silent: true 
+	# if we are already on that channel, which we might know from allChannels.
+	# But do we actually know it?
+	console.log "join; ALLCHANNELS IS: "
+	console.log allChannels
 	emit 'join', opts
 
 listen = (channel) ->
@@ -315,15 +324,7 @@ initSocket = () ->
 			for channel, idx in data.channels
 				channelNames.push('#' + channel)
 			if data.you
-#				channels = data.channels
-				allChannels = []
-				# TODO where to figure out the listened-to channels?
-				# It's initialChannels, right?
-					
-				# TODO do something about it
-				# Do it something like this
-#				allChannels = data.channels
-#				if allChannels
+				allChannels = data.channels
 
 				# If no channels on hash, and we get our channels,
 				# listen to all of them

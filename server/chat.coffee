@@ -46,10 +46,12 @@ class Chat
 				if not validChannelName channelName
 					return user.info "Channels must be alphanumeric and at most 25 characters."
 				channel = Channel.get channelName
-				channel.join user, silent: silent
-				channel.listen user, socket.id
+				log.d "### JOIN c #{channel} s #{silent}"
+				joined = channel.join user, silent: silent, socketId: socket.id
+#				channel.listen user, socket.id
 				user.join channel
-				log "*** #{user.nick()} has joined channel #{channel}."
+				if joined
+					log "*** #{user.nick()} has joined channel #{channel}."
 
 			listen: ({ channel }) =>
 				if not channel
