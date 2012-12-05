@@ -23,14 +23,17 @@ class Channel
 		@listeners = Object.create null
 
 	join: (user, opts) ->
-#		log "Channel.join #{user}, this #{this}"
+		log "Channel.join #{user}, this #{this}, opts #{s opts}"
 		alreadyThere = @users[user.id]?
 		@users[user.id] = user
 		if alreadyThere
-			user.info "You're already on channel #{this}."
+			unless opts?.silent
+				user.info "You're already on channel #{this}."
+			return false
 		else
 			unless opts?.silent
 				@emit 'join', nick: user.nick(), channel: @id
+			return true
 
 	listen: (user, socketId) ->
 		alreadyThere = @listeners[socketId]?

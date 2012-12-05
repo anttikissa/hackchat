@@ -226,8 +226,9 @@ ul.channels {
   display: inline-block;
 }
 ul.channels li {
+  cursor: pointer;
   display: inline;
-  color: #aaa;
+  color: #bfbfbf;
 }
 ul.channels li:after {
   content: ' | ';
@@ -235,6 +236,9 @@ ul.channels li:after {
 }
 ul.channels li:last-child:after {
   content: none;
+}
+ul.channels li:hover {
+  color: #000;
 }
 ul.channels li.current {
   color: #000;

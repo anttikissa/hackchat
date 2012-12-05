@@ -40,7 +40,7 @@ updateChannels = function() {
   lis = "";
   for (_i = 0, _len = channels.length; _i < _len; _i++) {
     channel = channels[_i];
-    lis += "<li>" + channel + "</li>";
+    lis += "<li>#" + channel + "</li>";
   }
   return $('.channels').html(lis);
 };
@@ -58,6 +58,7 @@ addChannel = function(channel) {
 removeChannel = function(channel) {
   var idx;
   idx = channels.indexOf(channel);
+  console.log("idx of channels is " + idx);
   if (idx !== -1) {
     channels.splice(idx, 1);
   }
@@ -68,7 +69,8 @@ removeChannel = function(channel) {
   if (channels.length === 0) {
     return null;
   } else {
-    return channels[(idx - 1 + channels.length) % channels.length];
+    console.log("idx of channels is " + idx);
+    return channels[idx === channels.length ? idx - 1 : idx];
   }
 };
 
@@ -83,7 +85,7 @@ setChannel = function(next) {
     return $('.channels li').each(function(idx, elem) {
       var content;
       content = $(elem).html();
-      return $(elem)[content === next ? 'addClass' : 'removeClass']('current');
+      return $(elem)[content === '#' + next ? 'addClass' : 'removeClass']('current');
     });
   } else {
     $('.mychannel').html('');
@@ -113,7 +115,7 @@ escapeHtml = function(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 };
 
-debug = true;
+debug = false;
 
 emit = function(what, msg) {
   if (debug) {
@@ -134,11 +136,13 @@ newNick = function(newNick) {
   });
 };
 
-join = function(channel) {
+join = function(channel, opts) {
+  if (opts == null) {
+    opts = {};
+  }
   channel = sanitize(channel);
-  return emit('join', {
-    channel: channel
-  });
+  opts.channel = channel;
+  return emit('join', opts);
 };
 
 listen = function(channel) {
@@ -602,6 +606,11 @@ $(function() {
   $('#cmd').blur(function() {
     return $('.input').removeClass('focus');
   });
+  $('.channels li').live('click', function(ev) {
+    var channel;
+    channel = $(ev.target).html();
+    return setChannel(sanitize(channel));
+  });
   $('time').live('click', function(ev) {
     return show("*** That's " + (new Date($(ev.target).attr('datetime'))) + ".");
   });
@@ -615,7 +624,9 @@ $(function() {
   console.log("initials " + (JSON.stringify(initialChannels)));
   for (_j = 0, _len1 = initialChannels.length; _j < _len1; _j++) {
     c = initialChannels[_j];
-    join(c);
+    join(c, {
+      silent: true
+    });
   }
   windowHeight = $(window).height();
   $(window).resize(function() {

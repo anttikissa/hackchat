@@ -113,6 +113,7 @@ ul.channels {
 	display: inline-block;
 
 	li {
+		cursor: pointer;
 		display: inline;
 		&:after {
 			content: ' | ';
@@ -123,7 +124,11 @@ ul.channels {
 			content: none;
 		}
 
-		color: #aaa;
+		&:hover {
+			color: #000;
+		}
+
+		color: #bfbfbf;
 		&.current {
 			color: #000;
 		}

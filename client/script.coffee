@@ -31,11 +31,10 @@ mynick = null
 mychannel = null
 
 updateChannels = ->
-#	console.log "updateChannels. channels [#{channels.join ','}]"
 	location.hash = channels.join ','
 	lis = ""
 	for channel in channels
-		lis += "<li>#{channel}</li>"
+		lis += "<li>##{channel}</li>"
 	$('.channels').html(lis)
 	
 # Add channel to list of current channels; if already there, do nothing
@@ -49,19 +48,18 @@ addChannel = (channel) ->
 # Remove channel from list, return channel next to it
 removeChannel = (channel) ->
 	idx = channels.indexOf channel
-#	console.log "removeChannel. channels [#{channels.join ','}] (#{channels.length})"
-#	console.log "idx is #{idx}"
 	if idx != -1
 		channels.splice idx, 1
-#	console.log "removeChannel. channels spliced: [#{channels.join ','}] (#{channels.length})"
 	updateChannels()
 	if channels.length <= 1
 		$('.ifchannel').hide()
 	if channels.length == 0
 		return null
 	else
-		return channels[(idx - 1 + channels.length) % channels.length]
+		return channels[if idx == channels.length then idx - 1 else idx]
 
+# TODO might be a nice idea to push the next channel in the place where current
+# channel is.
 setChannel = (next) ->
 #	console.log "setChannel #{next}"
 	mychannel = next
@@ -73,7 +71,8 @@ setChannel = (next) ->
 			$('.ifchannel').show()
 		$('.channels li').each (idx, elem) ->
 			content = $(elem).html()
-			$(elem)[if content == next then 'addClass' else 'removeClass'] 'current'
+			
+			$(elem)[if content == '#' + next then 'addClass' else 'removeClass'] 'current'
 	else
 		$('.mychannel').html('')
 		$('.ifchannel').hide()
@@ -96,7 +95,7 @@ escapeHtml = (s) ->
 	s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
 	.replace(/"/g, "&quot;") .replace(/'/g, "&#039;")
 
-debug = true
+debug = false
 
 emit = (what, msg) ->
 	if debug
@@ -109,9 +108,10 @@ ping = ->
 newNick = (newNick) ->
 	emit 'nick', newNick: newNick
 
-join = (channel) ->
+join = (channel, opts = {}) ->
 	channel = sanitize channel
-	emit 'join', channel: channel
+	opts.channel = channel
+	emit 'join', opts
 
 listen = (channel) ->
 	channel = sanitize channel
@@ -411,6 +411,7 @@ $ ->
 
 	initSocket()
 
+	# Try very hard to keep the keyboard focus in #cmd
 	focus = ->
 		$('#cmd').focus()
 	focus()
@@ -431,6 +432,7 @@ $ ->
 				clicks = 0
 			,	300)
 
+	# Magic keys (plus focus)
 	$(window).keypress (e) ->
 		if e.target.id != 'cmd'
 			$('#cmd').focus()
@@ -441,6 +443,7 @@ $ ->
 		if e.ctrlKey && e.keyCode == 21
 			$('#cmd').val('')
 
+	# Command line logic
 	$('#cmd').keydown (event) ->
 		if event.keyCode == 13
 			cmd = $(event.target).val()
@@ -458,6 +461,12 @@ $ ->
 	$('#cmd').blur ->
 		$('.input').removeClass('focus')
 
+	# Clicking on channel in mychannels changes to it
+	$('.channels li').live 'click', (ev) ->
+		channel = $(ev.target).html()
+		setChannel sanitize channel
+
+	# Silly time hover thing - remove me and replace with a better one
 	$('time').live 'click', (ev) ->
 		show "*** That's #{new Date($(ev.target).attr('datetime'))}."
 
@@ -468,7 +477,7 @@ $ ->
 	# TODO handling of these if no channels to listen
 	console.log "initials #{JSON.stringify initialChannels}"
 	for c in initialChannels
-		join c
+		join c, silent: true
 
 	windowHeight = $(window).height()
 

@@ -34,7 +34,7 @@ class Chat
 				log "*** #{user} ping"
 				socket.emit 'pong', data
 
-			join: ({ channel }) =>
+			join: ({ channel, silent }) =>
 				# TODO this should go somewhere else, possibly?
 				# Where to handle error checking exactly, since it's not logically
 				# part of User or Channel? Just pick one?
@@ -46,7 +46,7 @@ class Chat
 				if not validChannelName channelName
 					return user.info "Channels must be alphanumeric and at most 25 characters."
 				channel = Channel.get channelName
-				channel.join user
+				channel.join user, silent: silent
 				channel.listen user, socket.id
 				user.join channel
 				log "*** #{user.nick()} has joined channel #{channel}."

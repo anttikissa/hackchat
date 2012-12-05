@@ -8,6 +8,9 @@ Go through all resource-leaking TODOs where we don't unlisten to channels when
 user dies or leaves or something, and make that resources are collected properly
 at all times.
 
+Ideally should remember the last channel user was on. (mychannel, that is.) Does
+not need to go to the server. Localstorage is fine.
+
 Handle redis downtime even more gracefully (now session is just undefined in the
 session interceptor).
 
@@ -44,6 +47,7 @@ See what ircII does better when joining a channel. (Listing the participants,
 how does it look?)
 
 Topics
+    Clicking on a topic changes it to input box where you can change it.
 
 Private messages.
 
