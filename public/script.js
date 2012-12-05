@@ -1,4 +1,4 @@
-var addChannel, allChannels, channels, connected, debug, down, emit, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, initialChannels, isCommand, join, leave, list, listen, log, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, s, sanitize, say, setChannel, show, socket, unlisten, up, whois,
+var addChannel, allChannels, channels, connected, debug, down, emit, escapeHtml, execute, formatTime, help, history, historyIdx, initSocket, initialChannels, isCommand, join, leave, list, listen, log, mychannel, mynick, names, newNick, newestCommand, next, parseCommand, ping, prev, reconnect, removeChannel, s, sanitize, say, setChannel, show, socket, unlisten, up, updateChannels, whois,
   __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
   __slice = [].slice;
 
@@ -34,10 +34,21 @@ mynick = null;
 
 mychannel = null;
 
+updateChannels = function() {
+  var channel, lis, _i, _len;
+  location.hash = channels.join(',');
+  lis = "";
+  for (_i = 0, _len = channels.length; _i < _len; _i++) {
+    channel = channels[_i];
+    lis += "<li>" + channel + "</li>";
+  }
+  return $('.channels').html(lis);
+};
+
 addChannel = function(channel) {
   if (__indexOf.call(channels, channel) < 0) {
     channels.push(channel);
-    location.hash = channels.join(',');
+    updateChannels();
     return $('.ifchannel').show();
   }
 };
@@ -48,7 +59,7 @@ removeChannel = function(channel) {
   if (idx !== -1) {
     channels.splice(idx, 1);
   }
-  location.hash = channels.join(',');
+  updateChannels();
   if (channels.length === 0) {
     $('.ifchannel').hide();
     return null;
@@ -60,15 +71,22 @@ removeChannel = function(channel) {
 setChannel = function(next) {
   console.log("setChannel " + next);
   mychannel = next;
+  addChannel(next);
   if (next) {
     $('.mychannel').html('#' + next);
     $('.ifchannel').show();
-    addChannel(next);
+    return $('.channels li').each(function(idx, elem) {
+      var content;
+      content = $(elem).html();
+      console.log(elem);
+      console.log("HTML IS '" + content + "'");
+      console.log("NEXT IS '" + next + "'");
+      return $(elem)[content === next ? 'addClass' : 'removeClass']('current');
+    });
   } else {
     $('.mychannel').html('');
-    $('.ifchannel').hide();
+    return $('.ifchannel').hide();
   }
-  return console.log("post setChannel, channels is " + channels);
 };
 
 next = function() {

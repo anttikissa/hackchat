@@ -222,3 +222,20 @@ body {
 .input .ifchannel {
   display: none;
 }
+ul.channels {
+  display: inline-block;
+}
+ul.channels li {
+  display: inline;
+  color: #888;
+}
+ul.channels li:after {
+  content: ' | ';
+  color: #ccc;
+}
+ul.channels li:last-child:after {
+  content: none;
+}
+ul.channels li.current {
+  color: #000;
+}

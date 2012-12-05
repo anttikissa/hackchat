@@ -30,11 +30,18 @@ newestCommand = ''
 mynick = null
 mychannel = null
 
+updateChannels = ->
+	location.hash = channels.join ','
+	lis = ""
+	for channel in channels
+		lis += "<li>#{channel}</li>"
+	$('.channels').html(lis)
+	
 # Add channel to list of current channels; if already there, do nothing
 addChannel = (channel) ->
 	if channel not in channels
 		channels.push channel
-		location.hash = channels.join ','
+		updateChannels()
 		$('.ifchannel').show()
 
 # Remove channel from list, return channel next to it
@@ -42,7 +49,7 @@ removeChannel = (channel) ->
 	idx = channels.indexOf channel
 	if idx != -1
 		channels.splice idx, 1
-	location.hash = channels.join ','
+	updateChannels()
 	if channels.length == 0
 		$('.ifchannel').hide()
 		return null
@@ -52,16 +59,22 @@ removeChannel = (channel) ->
 setChannel = (next) ->
 	console.log "setChannel #{next}"
 	mychannel = next
+	addChannel next
+
 	if next
-#		console.log "mychannel is now #{next}"
 		$('.mychannel').html('#' + next)
 		$('.ifchannel').show()
-		addChannel next
+		$('.channels li').each (idx, elem) ->
+			content = $(elem).html()
+			console.log elem
+			console.log "HTML IS '#{content}'"
+			console.log "NEXT IS '#{next}'"
+			$(elem)[if content == next then 'addClass' else 'removeClass'] 'current'
 	else
 		$('.mychannel').html('')
 		$('.ifchannel').hide()
 
-	console.log "post setChannel, channels is #{channels}"
+#	console.log "post setChannel, channels is #{channels}"
 
 next = () ->
 	if channels.length <= 1 || not mychannel

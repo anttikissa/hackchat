@@ -1,4 +1,4 @@
-@import 'styles/reset.less';
+@import 'client/reset.less';
 
 .text {
 	font-size: 16px;
@@ -106,6 +106,27 @@ body {
 
 	.ifchannel {
 		display: none;
+	}
+}
+
+ul.channels {
+	display: inline-block;
+
+	li {
+		display: inline;
+		&:after {
+			content: ' | ';
+			color: #ccc;
+		}
+
+		&:last-child:after {
+			content: none;
+		}
+
+		color: #888;
+		&.current {
+			color: #000;
+		}
 	}
 }
 
