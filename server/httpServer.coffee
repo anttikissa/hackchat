@@ -97,8 +97,9 @@ run = ->
 	io.on 'connection', (socket) ->
 		chat.socketConnected socket
 
-	server.listen 3000
-	log.d 'Listening to http://localhost:3000'
+	port = 3001
+	server.listen port
+	log.d "Listening to http://localhost:#{port}"
 
 module.exports.run = run
 
