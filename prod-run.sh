@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd $(dirname $0)
+
 RESULT=2
 
 while [[ "$RESULT" == 2 ]]; do
