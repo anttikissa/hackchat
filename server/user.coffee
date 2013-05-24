@@ -65,7 +65,17 @@ class User
 	socketConnected: (socket) ->
 		@sockets[socket.id] = socket
 		log.d "#{this}: connected. Sockets: #{_.keys(@sockets).join ' '}"
-		@emit 'channels', channels: @channelList(), you: true
+		@info "Welcome to HackChat, #{@nick()}."
+		if @nick().match /^anon/
+			@info "Type /nick <nick> to change your nick."
+			@info "Example: /nick charlie"
+		channels = @channelList()
+		if channels.length
+			@emit 'channels', channels: @channelList(), you: true
+		else
+			@info "Type /join <channel> to join a channel."
+			@info "Example: /join #hackchat"
+		@info "Type /help for help."
 
 	socketDisconnected: (socket) ->
 		delete @sockets[socket.id]
