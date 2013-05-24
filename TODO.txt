@@ -1,5 +1,9 @@
 # Items to do
 
+When connecting the first time, we should see a message.  When reconnecting, we
+shouldn't see a message.  Possibly this should be done via a "hello" message
+that the client sends when first connecting. 
+
 Should catch when user changes the hash himself.
 
 If you go to localhost/#gaga and are not on #gaga, then weirdity happens.
