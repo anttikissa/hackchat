@@ -485,7 +485,7 @@ initSocket = function() {
     info: function(_arg) {
       var msg;
       msg = _arg.msg;
-      return show("*** " + msg);
+      return show("[info] " + msg);
     },
     msg: function(_arg) {
       var from, msg;

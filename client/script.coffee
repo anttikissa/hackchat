@@ -361,7 +361,7 @@ initSocket = () ->
 			show "*** Failed to reconnect. Please try again later."
 
 		info: ({ msg }) ->
-			show "*** #{msg}"
+			show "[info] #{msg}"
 
 		msg: ({ from, msg }) ->
 			show "<#{from}> #{msg}"
