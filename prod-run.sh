@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH=$PATH:/usr/local/bin
+
 cd $(dirname $0)
 
 RESULT=2
