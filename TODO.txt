@@ -1,5 +1,13 @@
 # Items to do
 
+Why doesn't it say "You have joined channel #foo"
+
+/invite - give easily accessible URL to this channel to someone
+
+Possibly invite someone on Twitter or Facebook, if you're logged in via them
+
+Add the feature that you actually can log in via Twitter and/or Facebook
+
 When connecting the first time, we should see a message.  When reconnecting, we
 shouldn't see a message.  Possibly this should be done via a "hello" message
 that the client sends when first connecting. 
